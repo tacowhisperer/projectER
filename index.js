@@ -21,7 +21,9 @@ app.get('/Andres', (request, response) => {
     response.send("Hello Andres!");
 })
 
-
+app.get('WeeklyMenu', (request, response) => {
+    response.send(serveryJsonObjects);
+})
 
 // Holds the different PDF JSON objects
 let serveryJsonObjects;
