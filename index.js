@@ -21,7 +21,7 @@ app.get('/Andres', (request, response) => {
     response.send("Hello Andres!");
 })
 
-app.get('WeeklyMenu', (request, response) => {
+app.get('/WeeklyMenu', (request, response) => {
     response.send(serveryJsonObjects);
 })
 
