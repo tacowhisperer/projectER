@@ -20,6 +20,7 @@
     "download-file": "^0.1.5",
     "express": "^4.16.2",
     "pdf2json": "^1.1.7",
-    "pdfjs-dist": "^2.0.402"
+    "pdfjs-dist": "^2.0.402",
+    "request": "^2.83.0"
   }
 }
