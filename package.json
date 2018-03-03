@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/tacowhisperer/projectER#readme",
   "dependencies": {
+    "download-file": "^0.1.5",
     "pdfjs-dist": "^2.0.402"
   }
 }
