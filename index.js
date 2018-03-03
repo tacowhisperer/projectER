@@ -21,9 +21,6 @@ app.get('/Andres', (request, response) => {
     response.send("Hello Andres!");
 })
 
-app.get('/WeeklyMenu', (request, response) => {
-    response.send(serveryJsonObjects);
-})
 
 // Holds the different PDF JSON objects
 let serveryJsonObjects;
@@ -166,6 +163,10 @@ function removeCamelCase(str) {
 	return str.charAt(0).toUpperCase() + str.slice(1).replace(/([A-Z])([A-Z]*)/g, (match, p1, p2) =>
 		" " + (typeof(p1) == "string" ? p1 : "") + (typeof(p2) == "string" ? p2 : ""));
 }
+
+app.get('/WeeklyMenu', (request, response) => {
+    response.send(serveryJsonObjects);
+})
 
 app.listen(app.get('port'), () => {
     console.log('running on port', app.get('port'));
