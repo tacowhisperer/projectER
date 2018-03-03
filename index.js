@@ -39,16 +39,13 @@ function getPdfUrlOf(buildingName, diningHTML) {
 		console.error("Unexpected number of matches found. Got " + matchesArray.length);
 		console.error(matchesArray);
 	}
-
 }
 
 function getPdfFromURL(url) {
     pdfjs.workersrc = url;
-
-    pdfjs.getDocument(url).then((pdf) => {
-        
-        for (var i = 0; i < pdf.pdfInfo.numPages; i++) {
-       	    const ii = i + 1;
+    pdfjs.getDocument(url).then(pdf => {
+        for (let i = 1; i <= pdf.pdfInfo.numPages; i++) {
+       	    const ii = i;
 
             Promise.all([getPdfPageTextPromise(ii, pdf)]).then(pageTextArray => {
             	console.log("***Page " + ii + "***\n");
@@ -88,8 +85,9 @@ function getPdfPageTextPromise(pageNum, PDFDocumentInstance) {
                 // Concatenate the string of the item to the final string
                 for (var i = 0; i < textItems.length; i++) {
                     var item = textItems[i];
+                    const ii = i;
 
-                    finalString += item.str + "\n\n\n";
+                    finalString += "Text Item #" + ii + ":\n" + item.str + "\n\n";
                 }
 
                 // Solve promise with the text retrieven from the page

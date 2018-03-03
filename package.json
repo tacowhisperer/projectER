@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/tacowhisperer/projectER/issues"
   },
-  "homepage": "https://github.com/tacowhisperer/projectER#readme"
+  "homepage": "https://github.com/tacowhisperer/projectER#readme",
+  "dependencies": {
+    "pdfjs-dist": "^2.0.402"
+  }
 }
