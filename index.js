@@ -6,6 +6,9 @@ const PDFParser = require('pdf2json');
 const DINING_URL = "http://dining.rice.edu/undergraduate-dining/college-serveries/weekly-menus/";
 const MENU_FOLDER = "./menu_pdfs/";
 
+// Holds the different PDF JSON objects
+let serveryJsonObjects;
+
 http.get(DINING_URL, response => {
 	let diningHTML = "";
 
@@ -25,7 +28,15 @@ http.get(DINING_URL, response => {
 			west: getPdfUrlOf("West", diningHTML)
 		};
 
-        	savePdfToFile(pdfUrls, savePdfJsonToFile, Object.keys(pdfUrls), () => console.log("Success!"));
+		let serveryKeys = Object.keys(pdfUrls);
+
+		// Initialize the array that will allow synchronization to occur later.
+		serveryJsonObjects = new Array(serveryKeys.length);
+		for (let i = 0; i < serveryKeys.length; i++)
+			serveryJsonObjects[i] = null;
+
+		// Save the PDF file as-is given from the Rice Dining website.
+        	savePdfToFile(pdfUrls, savePdfJsonToFile);
 	});
 
 }).on("error", e => console.error("GET REQUEST ERROR: " + e.message));
@@ -40,78 +51,99 @@ function getPdfUrlOf(buildingName, diningHTML) {
 		return matchesArray[2];
 
 	else {
-		console.error("Unexpected number of matches found. Got " + matchesArray.length);
+		console.error("Unexpected number of matches found in diningHTML. Got " + matchesArray.length + " matches.");
 		console.error(matchesArray);
 	}
 }
 
-function savePdfToFile(pdfUrls, callback, arg0, arg1) {
-	for (location in pdfUrls) {
-		let url = pdfUrls[location];
-		let options = {
+function savePdfToFile(pdfUrls, pdfProcessor) {
+	for (serveryLocationName in pdfUrls) {
+		const url = pdfUrls[serveryLocationName];
+		const options = {
 			directory: MENU_FOLDER,
-			filename: location + ".pdf"
+			filename: serveryLocationName + ".pdf"
 		};
 
+		const currentLocation = serveryLocationName;
 		download(url, options, e => {
 			if (e)
 				console.error("Error downloading PDF from '" + url + "'");
-			else 
+			else {
 				console.log("Saved " + options.filename + " to file!");
-
-			callback(arg0, arg1);
+				pdfProcessor(currentLocation);
+			}
 		});
 	}
 }
 
-function savePdfJsonToFile(pdfs, callback) {
-	for (let i = 0; i < pdfs.length; i++) {
-		let pdfParser = new PDFParser();
+function savePdfJsonToFile(serveryLocationName, callback) {
+	let pdfParser = new PDFParser();
 
-		pdfParser.on("pdfParser_dataError", e => {
-			console.error("Error parsing '" + pdfs[i] + "':");
-			console.error(e.parseError)
-		});
+	pdfParser.on("pdfParser_dataError", e => {
+		console.error("Error parsing '" + serveryLocationName + ".pdf':");
+		console.error(e.parseError)
+	});
 
-		pdfParser.on("pdfParser_dataReady", rawPdfJsonObject => {
-			// Stores the Pages array "as-is" from the pdf2json function call.
-			let pagesArray = rawPdfJsonObject.formImage.Pages;
-			for (let i = 0; i < pagesArray.length; i++) {
-				let pageInfoObj = pagesArray[i];
+	pdfParser.on("pdfParser_dataReady", rawPdfJsonObject => {
+		const currentLocation = serveryLocationName;
 
-				// Stores the condensed information from the raw pdf2json object.
-				let newPageInfo = {};
+		// Stores the Pages array "as-is" from the pdf2json function call.
+		let pagesArray = rawPdfJsonObject.formImage.Pages;
+		for (let j = 0; j < pagesArray.length; j++) {
+			let pageInfoObj = pagesArray[j];
 
-				newPageInfo.height = pageInfoObj.Height;
-				newPageInfo.texts = pageInfoObj.Texts;
+			// Stores the condensed information from the raw pdf2json object.
+			let newPageInfo = {};
 
-				for (let j = 0; j < newPageInfo.texts.length; j++) {
-					// Stores only the necessary information for each text block.
-					let text = {};
+			newPageInfo.height = pageInfoObj.Height;
+			newPageInfo.texts = pageInfoObj.Texts;
 
-					text.x = newPageInfo.texts[j].x;
-					text.y = newPageInfo.texts[j].y;
-					text.ts = newPageInfo.texts[j].R[0].TS;
-					text.t = newPageInfo.texts[j].R[0].T;
+			for (let k = 0; k < newPageInfo.texts.length; k++) {
+				// Stores only the necessary information for each text block.
+				let text = {};
 
-					text.t = decodeURIComponent(text.t);
+				text.x = newPageInfo.texts[k].x;
+				text.y = newPageInfo.texts[k].y;
+				text.ts = newPageInfo.texts[k].R[0].TS;
+				text.t = newPageInfo.texts[k].R[0].T;
 
-					// Override the raw data with the compressed data
-					newPageInfo.texts[j] = text;
-				}
+				text.t = decodeURIComponent(text.t);
 
-				pagesArray[i] = newPageInfo;
+				// Override the raw data with the compressed data
+				newPageInfo.texts[k] = text;
 			}
 
-			let pdfJsonObject = {
-				servery: pdfs[i],
-				numPages: pagesArray.length,
-				pages: pagesArray
-			};
+			pagesArray[j] = newPageInfo;
+		}
 
-			fs.writeFile(MENU_FOLDER + pdfs[i] + ".json", JSON.stringify(pdfJsonObject, null, "\t"), callback)
-		});
+		let pdfJsonObject = {
+			servery: removeCamelCase(currentLocation),
+			numPages: pagesArray.length,
+			pages: pagesArray
+		};
 
-		pdfParser.loadPDF(MENU_FOLDER + pdfs[i] + ".pdf");
-	}
+		let descriptiveCallback = e => {
+			const fileName = currentLocation + ".json";
+
+			if (e) {
+				console.error("Error writing '" + fileName + "' to file.");
+				console.error(e.message);
+			} else
+				console.log("Successfully wrote '" + fileName + "' to file.");
+		};
+		
+		fs.writeFile(MENU_FOLDER + currentLocation + ".json",
+			JSON.stringify(pdfJsonObject, null, "\t"), "utf8", descriptiveCallback);
+	});
+
+	pdfParser.loadPDF(MENU_FOLDER + serveryLocationName + ".pdf");
+}
+
+function clump(pdfJsonObject, index) {
+	let daysOfWeek = 5;
+}
+
+function removeCamelCase(str) {
+	return str.charAt(0).toUpperCase() + str.slice(1).replace(/([A-Z])([A-Z]*)/g, (match, p1, p2) =>
+		" " + (typeof(p1) == "string" ? p1 : "") + (typeof(p2) == "string" ? p2 : ""));
 }
