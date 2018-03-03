@@ -1,10 +1,27 @@
 const download = require('download-file');
+const express = require('express');
 const fs = require('fs');
 const http = require('http');
 const PDFParser = require('pdf2json');
+const request = require('request');
+const app = express();
 
 const DINING_URL = "http://dining.rice.edu/undergraduate-dining/college-serveries/weekly-menus/";
 const MENU_FOLDER = "./menu_pdfs/";
+
+
+app.set('port', (process.env.PORT || 5000));
+
+app.get('/', (request, response) => {
+    response.send("Hello!");
+})
+
+
+app.get('/Andres', (request, response) => {
+    response.send("Hello Andres!");
+})
+
+
 
 // Holds the different PDF JSON objects
 let serveryJsonObjects;
@@ -147,3 +164,11 @@ function removeCamelCase(str) {
 	return str.charAt(0).toUpperCase() + str.slice(1).replace(/([A-Z])([A-Z]*)/g, (match, p1, p2) =>
 		" " + (typeof(p1) == "string" ? p1 : "") + (typeof(p2) == "string" ? p2 : ""));
 }
+
+app.listen(app.get('port'), () => {
+    console.log('running on port', app.get('port'));
+})
+
+
+
+
