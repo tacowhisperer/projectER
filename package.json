@@ -1,0 +1,19 @@
+{
+  "name": "projecter",
+  "version": "1.0.0",
+  "description": "In theory, it provides a clean way to obtain food information for Rice serveries.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tacowhisperer/projectER.git"
+  },
+  "author": "DrProfSgtMrJ-tacowhisperer",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/tacowhisperer/projectER/issues"
+  },
+  "homepage": "https://github.com/tacowhisperer/projectER#readme"
+}
