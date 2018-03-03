@@ -1,4 +1,5 @@
 const http = require('http');
+const pdfjs = require('pdfjs-dist');
 const DINING_URL = "http://dining.rice.edu/undergraduate-dining/college-serveries/weekly-menus/";
 
 http.get(DINING_URL, response => {
@@ -28,7 +29,7 @@ http.get(DINING_URL, response => {
 function getPdfUrlOf(buildingName, diningHTML) {
 	let regex = new RegExp("<p>(\\r\\n\\s)*<a href=\"([^\"]+)\" target=\"_blank\" rel=\"noopener\">" + buildingName + "<\\/a>");
 
-	let matchesArray = diningHTML.match(regex, );
+	let matchesArray = diningHTML.match(regex);
 
 	if (matchesArray.length == 3)
 		// 0 = Entire match, 1 = first parenthesis, 2 = URL parenthesis
@@ -40,3 +41,5 @@ function getPdfUrlOf(buildingName, diningHTML) {
 	}
 
 }
+
+console.log(pdfjs);
