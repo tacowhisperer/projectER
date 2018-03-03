@@ -20,8 +20,7 @@ http.get(DINING_URL, response => {
 			south: getPdfUrlOf("South", diningHTML),
 			west: getPdfUrlOf("West", diningHTML)
 		};
-
-		console.log(pdfUrls);
+        getPdfFromURL(pdfUrls.baker);
 	});
 
 }).on("error", e => console.error("GET REQUEST ERROR: " + e.message));
@@ -42,4 +41,16 @@ function getPdfUrlOf(buildingName, diningHTML) {
 
 }
 
-console.log(pdfjs);
+function getPdfFromURL(url) {
+    pdfjs.workersrc = url;
+
+    pdfjs.getDocument(url).then((pdf) => {
+        console.log("SUCCESSSSS");
+        for (var i = 0; i < pdf.pdfInfo.numPages; i++) {
+            console.log(i);
+        }
+    }).catch(
+        (e) => console.error(e.message));
+
+
+}
