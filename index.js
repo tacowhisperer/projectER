@@ -74,16 +74,31 @@ function savePdfJsonToFile(pdfs, callback) {
 		});
 
 		pdfParser.on("pdfParser_dataReady", rawPdfJsonObject => {
+			// Stores the Pages array "as-is" from the pdf2json function call.
 			let pagesArray = rawPdfJsonObject.formImage.Pages;
 			for (let i = 0; i < pagesArray.length; i++) {
 				let pageInfoObj = pagesArray[i];
+
+				// Stores the condensed information from the raw pdf2json object.
 				let newPageInfo = {};
 
 				newPageInfo.height = pageInfoObj.Height;
 				newPageInfo.texts = pageInfoObj.Texts;
 
-				for (let j = 0; j < newPageInfo.texts.length; j++)
-					newPageInfo.texts[j].R[0].T = decodeURIComponent(newPageInfo.texts[j].R[0].T);
+				for (let j = 0; j < newPageInfo.texts.length; j++) {
+					// Stores only the necessary information for each text block.
+					let text = {};
+
+					text.x = newPageInfo.texts[j].x;
+					text.y = newPageInfo.texts[j].y;
+					text.ts = newPageInfo.texts[j].R[0].TS;
+					text.t = newPageInfo.texts[j].R[0].T;
+
+					text.t = decodeURIComponent(text.t);
+
+					// Override the raw data with the compressed data
+					newPageInfo.texts[j] = text;
+				}
 
 				pagesArray[i] = newPageInfo;
 			}
