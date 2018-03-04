@@ -1,0 +1,784 @@
+{
+	"servery": "Sid Rich",
+	"numPages": 3,
+	"pages": [
+		[],
+		[
+			[
+				{
+					"x": 8.67,
+					"y": 1.904,
+					"t": "Monday"
+				},
+				{
+					"x": 4.001,
+					"y": 2.587,
+					"t": " Grilled Chicken with Pimento & Olive "
+				},
+				{
+					"x": 9.113,
+					"y": 3.308,
+					"t": "Relish "
+				},
+				{
+					"x": 4.871,
+					"y": 5.246,
+					"t": " Lemon Garlic Potatoes Wedges "
+				},
+				{
+					"x": 3.9539999999999997,
+					"y": 7.185,
+					"t": " Chickpea Frittata with Parsley Salad  "
+				},
+				{
+					"x": 6.222,
+					"y": 9.123,
+					"t": " Tilapia with Chimichurri "
+				},
+				{
+					"x": 4.518,
+					"y": 10.34,
+					"t": " Roasted Fennel, Cauliflower and "
+				},
+				{
+					"x": 8.753,
+					"y": 11.061,
+					"t": "Carrots "
+				},
+				{
+					"x": 4.142,
+					"y": 12.279,
+					"t": " Caprese Grilled Cheese and Tomato "
+				},
+				{
+					"x": 8.212,
+					"y": 13,
+					"t": "Crème Soup "
+				},
+				{
+					"x": 4.269,
+					"y": 14.217,
+					"t": " Italian Vegetable Salad with Lemon "
+				},
+				{
+					"x": 8.299,
+					"y": 14.938,
+					"t": "Vinaigrette "
+				}
+			],
+			[
+				{
+					"x": 20.929,
+					"y": 0.843,
+					"t": "Lunch Menu"
+				},
+				{
+					"x": 22.329,
+					"y": 1.904,
+					"t": "Tuesday"
+				},
+				{
+					"x": 18.429,
+					"y": 2.587,
+					"t": " Turkey, White Cheddar and Apple "
+				},
+				{
+					"x": 22.161,
+					"y": 3.308,
+					"t": "Turnovers "
+				},
+				{
+					"x": 19.722,
+					"y": 5.246,
+					"t": " Orange Tea Scented Rice "
+				},
+				{
+					"x": 18.541,
+					"y": 7.185,
+					"t": " Black Bean and Plantain Patties "
+				},
+				{
+					"x": 18.415,
+					"y": 8.402,
+					"t": " Pasta w/ Smoked Salmon, Shrimp "
+				},
+				{
+					"x": 18.931,
+					"y": 9.123,
+					"t": "Asparagus & Lemon Dill Sauce "
+				},
+				{
+					"x": 19.943,
+					"y": 11.061,
+					"t": " Broccoli and Tomatoes "
+				},
+				{
+					"x": 21.719,
+					"y": 13,
+					"t": " Waffle Fries "
+				},
+				{
+					"x": 17.56,
+					"y": 14.217,
+					"t": " Kale Salad with Carrots, Cranberries "
+				},
+				{
+					"x": 22.098,
+					"y": 14.938,
+					"t": "and Raisins "
+				}
+			],
+			[
+				{
+					"x": 35.322,
+					"y": 1.904,
+					"t": "Wednesday"
+				},
+				{
+					"x": 31.635,
+					"y": 2.587,
+					"t": " Dark Cherry Honey Balsamic Baked "
+				},
+				{
+					"x": 36.201,
+					"y": 3.308,
+					"t": "Chicken "
+				},
+				{
+					"x": 33.971,
+					"y": 5.246,
+					"t": " Steamed Jasmine Rice "
+				},
+				{
+					"x": 32.967,
+					"y": 7.185,
+					"t": " Udon Noodle Tofu Stir Fry "
+				},
+				{
+					"x": 31.293,
+					"y": 8.402,
+					"t": " Smoked Sausage with Roasted Apples "
+				},
+				{
+					"x": 35.68,
+					"y": 9.123,
+					"t": "and Fennel "
+				},
+				{
+					"x": 35.306,
+					"y": 11.061,
+					"t": " Dill Carrots "
+				},
+				{
+					"x": 34.303,
+					"y": 13,
+					"t": " Fried Shrimp Tacos  "
+				},
+				{
+					"x": 35.528,
+					"y": 14.938,
+					"t": " Cobb Salad "
+				}
+			],
+			[
+				{
+					"x": 6.545,
+					"y": 16.908,
+					"t": "Thursday"
+				},
+				{
+					"x": 4.8,
+					"y": 17.591,
+					"t": " Ham, Avocado, Local "
+				},
+				{
+					"x": 4.553,
+					"y": 18.312,
+					"t": "Tomato & Coleslaw on "
+				},
+				{
+					"x": 4.431,
+					"y": 19.593,
+					"t": " Garlic Roasted Potato "
+				},
+				{
+					"x": 7.042,
+					"y": 20.314,
+					"t": "Wedges "
+				},
+				{
+					"x": 4.485,
+					"y": 21.596,
+					"t": " Stewed Chickpeas with "
+				},
+				{
+					"x": 4.961,
+					"y": 22.317,
+					"t": "Steamed Brown Rice "
+				},
+				{
+					"x": 4.762,
+					"y": 24.319,
+					"t": " Chile Lime Baked Cod "
+				},
+				{
+					"x": 4.217,
+					"y": 25.601,
+					"t": " Local Beer Cheese Soup "
+				},
+				{
+					"x": 4.526,
+					"y": 26.322,
+					"t": "with Pretzel Croutons "
+				},
+				{
+					"x": 5.217,
+					"y": 28.324,
+					"t": " Turkey Corn Dogs "
+				},
+				{
+					"x": 5.208,
+					"y": 29.606,
+					"t": " Local Strawberry "
+				},
+				{
+					"x": 6.487,
+					"y": 30.327,
+					"t": "Milkshakes "
+				},
+				{
+					"x": 13.144,
+					"y": 31.924999999999997,
+					"t": "Contains"
+				},
+				{
+					"x": 5.376,
+					"y": 31.936999999999998,
+					"t": "= Vegan"
+				},
+				{
+					"x": 13.144,
+					"y": 32.804,
+					"t": "Contains"
+				},
+				{
+					"x": 5.376,
+					"y": 32.816,
+					"t": "= Vegetarian"
+				}
+			],
+			[
+				{
+					"x": 17.244,
+					"y": 16.908,
+					"t": "Friday"
+				},
+				{
+					"x": 15.248,
+					"y": 18.312,
+					"t": " Red Curry Chicken "
+				},
+				{
+					"x": 16.745,
+					"y": 20.315,
+					"t": " Rice Pilaf "
+				},
+				{
+					"x": 13.968,
+					"y": 21.596,
+					"t": " Ranch Style Lentil Potato "
+				},
+				{
+					"x": 16.66,
+					"y": 22.317,
+					"t": "Casserole "
+				},
+				{
+					"x": 13.899,
+					"y": 23.598,
+					"t": " Cornmeal Crusted Catfish "
+				},
+				{
+					"x": 15.427,
+					"y": 24.32,
+					"t": "with Tartar Sauce "
+				},
+				{
+					"x": 14.126,
+					"y": 25.601,
+					"t": " Roasted Local Vegetable "
+				},
+				{
+					"x": 17.423,
+					"y": 26.322,
+					"t": "Blend "
+				},
+				{
+					"x": 14.357,
+					"y": 27.603,
+					"t": " Brunch Pizza Flatbread: "
+				},
+				{
+					"x": 14.419,
+					"y": 30.327,
+					"t": " Orange Whoolius Drink "
+				},
+				{
+					"x": 15.311,
+					"y": 31.924999999999997,
+					"t": "Gluten"
+				},
+				{
+					"x": 20.735,
+					"y": 31.924999999999997,
+					"t": "Contains"
+				},
+				{
+					"x": 22.901,
+					"y": 31.924999999999997,
+					"t": "Milk"
+				},
+				{
+					"x": 15.311,
+					"y": 32.804,
+					"t": "Soy"
+				},
+				{
+					"x": 20.488,
+					"y": 32.804,
+					"t": "Contains"
+				},
+				{
+					"x": 22.655,
+					"y": 32.804,
+					"t": "Eggs"
+				}
+			],
+			[
+				{
+					"x": 26.83,
+					"y": 16.908,
+					"t": "Saturday"
+				},
+				{
+					"x": 29.668,
+					"y": 31.926000000000002,
+					"t": "Contains"
+				},
+				{
+					"x": 31.835,
+					"y": 31.926000000000002,
+					"t": "Fish"
+				},
+				{
+					"x": 29.668,
+					"y": 32.832,
+					"t": "Contains"
+				},
+				{
+					"x": 31.835,
+					"y": 32.832,
+					"t": "Shellfish"
+				}
+			],
+			[
+				{
+					"x": 37.479,
+					"y": 16.908,
+					"t": "Sunday"
+				},
+				{
+					"x": 37.93,
+					"y": 31.924999999999997,
+					"t": "Contains"
+				},
+				{
+					"x": 40.097,
+					"y": 31.924999999999997,
+					"t": "Peanuts"
+				},
+				{
+					"x": 37.93,
+					"y": 32.803,
+					"t": "Contains"
+				},
+				{
+					"x": 40.097,
+					"y": 32.803,
+					"t": "Treenuts"
+				}
+			]
+		],
+		[
+			[
+				{
+					"x": 9.305,
+					"y": 1.904,
+					"t": "Monday"
+				},
+				{
+					"x": 7.197,
+					"y": 3.308,
+					"t": " Braised Chicken Legs "
+				},
+				{
+					"x": 4.863,
+					"y": 4.525,
+					"t": " Baked Mac & Cheese with Corn Chip "
+				},
+				{
+					"x": 9.521,
+					"y": 5.246,
+					"t": "Crunch "
+				},
+				{
+					"x": 8.438,
+					"y": 7.185,
+					"t": "Tomato Crème  "
+				},
+				{
+					"x": 5.45,
+					"y": 8.402,
+					"t": " Sweet and Smoky Pork Ribs with "
+				},
+				{
+					"x": 7.601,
+					"y": 9.123,
+					"t": "Pickled Vegetables "
+				},
+				{
+					"x": 4.406,
+					"y": 11.061,
+					"t": " Green Beans with Sautéed Mushrooms "
+				},
+				{
+					"x": 5.321,
+					"y": 12.279,
+					"t": " Onion Rings with Green Goddess "
+				},
+				{
+					"x": 8.534,
+					"y": 13,
+					"t": "Dipping Sauce "
+				},
+				{
+					"x": 7.049,
+					"y": 14.938,
+					"t": " Strawberry Lemonade "
+				}
+			],
+			[
+				{
+					"x": 22.041,
+					"y": 0.843,
+					"t": "Dinner Menu"
+				},
+				{
+					"x": 22.963,
+					"y": 1.904,
+					"t": "Tuesday"
+				},
+				{
+					"x": 18.469,
+					"y": 3.308,
+					"t": " Beef Meatballs with Marinara Sauce "
+				},
+				{
+					"x": 18.689,
+					"y": 4.525,
+					"t": " Pasta with Tomato, Fresh Basil and "
+				},
+				{
+					"x": 23.091,
+					"y": 5.246,
+					"t": "Olive Oil "
+				},
+				{
+					"x": 18.477,
+					"y": 6.463,
+					"t": " Butternut Squash Ravioli w/ Brown "
+				},
+				{
+					"x": 20.313,
+					"y": 7.185,
+					"t": "Butter and Pumpkin Seeds "
+				},
+				{
+					"x": 18.453,
+					"y": 8.402,
+					"t": " Grilled Chicken Breast with Spinach "
+				},
+				{
+					"x": 21.037,
+					"y": 9.123,
+					"t": "and Dijon Vinaigrette "
+				},
+				{
+					"x": 20.723,
+					"y": 11.061,
+					"t": " Roasted Local Squash "
+				},
+				{
+					"x": 18.58,
+					"y": 12.279,
+					"t": " Fondue Station: Cheese, Chocolate "
+				},
+				{
+					"x": 21.591,
+					"y": 13,
+					"t": "and Carmel Sauce "
+				},
+				{
+					"x": 21.45,
+					"y": 14.938,
+					"t": " Apple Cider Punch "
+				}
+			],
+			[
+				{
+					"x": 35.957,
+					"y": 1.904,
+					"t": "Wednesday"
+				},
+				{
+					"x": 32.044,
+					"y": 2.587,
+					"t": " Local Coffee Rubbed Pork Loin with "
+				},
+				{
+					"x": 36.347,
+					"y": 3.308,
+					"t": "Demi Glace  "
+				},
+				{
+					"x": 32.895,
+					"y": 5.246,
+					"t": " Roasted Local Sweet Potatoes "
+				},
+				{
+					"x": 32.558,
+					"y": 6.463,
+					"t": " Quinoa Stuffed Portabellas with "
+				},
+				{
+					"x": 35.407,
+					"y": 7.185,
+					"t": "Herb Vinaigrette "
+				},
+				{
+					"x": 32.467,
+					"y": 8.402,
+					"t": " Carved Turkey with Pan Gravy and "
+				},
+				{
+					"x": 34.677,
+					"y": 9.123,
+					"t": "Corn Bread Stuffing "
+				},
+				{
+					"x": 35.009,
+					"y": 11.061,
+					"t": " Grilled Asparagus  "
+				},
+				{
+					"x": 33.029,
+					"y": 12.279,
+					"t": " Peking Duck with Hoisin Sauce, "
+				},
+				{
+					"x": 34.187,
+					"y": 13,
+					"t": "Scallions and Bao Buns "
+				},
+				{
+					"x": 34.012,
+					"y": 14.938,
+					"t": " Vegetable Noodle Salad "
+				}
+			],
+			[
+				{
+					"x": 7.179,
+					"y": 16.908,
+					"t": "Thursday"
+				},
+				{
+					"x": 6.031,
+					"y": 18.312,
+					"t": " Beef Stroganoff  "
+				},
+				{
+					"x": 6.72,
+					"y": 20.314,
+					"t": " Egg Noodles "
+				},
+				{
+					"x": 4.686,
+					"y": 21.596,
+					"t": " Vegetable Fried Rice with "
+				},
+				{
+					"x": 7.517,
+					"y": 22.317,
+					"t": "Edamame "
+				},
+				{
+					"x": 5.062,
+					"y": 24.319,
+					"t": " Teriyaki Chicken Thighs "
+				},
+				{
+					"x": 5.593,
+					"y": 26.322,
+					"t": " Sautéed Vegetables "
+				},
+				{
+					"x": 4.52,
+					"y": 27.603,
+					"t": " Loaded Tater Tot Bar with "
+				},
+				{
+					"x": 4.576,
+					"y": 28.325,
+					"t": "Queso, Pico and Bean Chili "
+				},
+				{
+					"x": 6.418,
+					"y": 30.327,
+					"t": " Ginger Limeade "
+				},
+				{
+					"x": 13.779,
+					"y": 31.924999999999997,
+					"t": "Contains"
+				},
+				{
+					"x": 6.011,
+					"y": 31.936999999999998,
+					"t": "= Vegan"
+				},
+				{
+					"x": 13.779,
+					"y": 32.804,
+					"t": "Contains"
+				},
+				{
+					"x": 6.011,
+					"y": 32.816,
+					"t": "= Vegetarian"
+				}
+			],
+			[
+				{
+					"x": 17.878,
+					"y": 16.908,
+					"t": "Friday"
+				},
+				{
+					"x": 15.945,
+					"y": 31.924999999999997,
+					"t": "Gluten"
+				},
+				{
+					"x": 21.369,
+					"y": 31.924999999999997,
+					"t": "Contains"
+				},
+				{
+					"x": 23.536,
+					"y": 31.924999999999997,
+					"t": "Milk"
+				},
+				{
+					"x": 15.945,
+					"y": 32.804,
+					"t": "Soy"
+				},
+				{
+					"x": 21.123,
+					"y": 32.804,
+					"t": "Contains"
+				},
+				{
+					"x": 23.289,
+					"y": 32.804,
+					"t": "Eggs"
+				}
+			],
+			[
+				{
+					"x": 27.464,
+					"y": 16.908,
+					"t": "Saturday"
+				},
+				{
+					"x": 27.109,
+					"y": 22.666,
+					"t": " Dinner "
+				},
+				{
+					"x": 25.798,
+					"y": 23.862,
+					"t": "available at "
+				},
+				{
+					"x": 26.199,
+					"y": 25.056,
+					"t": "North and "
+				},
+				{
+					"x": 24.536,
+					"y": 26.251,
+					"t": "Seibel Serveries "
+				},
+				{
+					"x": 30.303,
+					"y": 31.926000000000002,
+					"t": "Contains"
+				},
+				{
+					"x": 32.469,
+					"y": 31.926000000000002,
+					"t": "Fish"
+				},
+				{
+					"x": 30.303,
+					"y": 32.832,
+					"t": "Contains"
+				},
+				{
+					"x": 32.469,
+					"y": 32.832,
+					"t": "Shellfish"
+				}
+			],
+			[
+				{
+					"x": 38.114,
+					"y": 16.908,
+					"t": "Sunday"
+				},
+				{
+					"x": 38.565,
+					"y": 31.924999999999997,
+					"t": "Contains"
+				},
+				{
+					"x": 40.731,
+					"y": 31.924999999999997,
+					"t": "Peanuts"
+				},
+				{
+					"x": 38.565,
+					"y": 32.803,
+					"t": "Contains"
+				},
+				{
+					"x": 40.731,
+					"y": 32.803,
+					"t": "Treenuts"
+				}
+			]
+		]
+	]
+}
