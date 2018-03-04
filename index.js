@@ -147,6 +147,7 @@ function savePdfJsonToFile(serveryLocationName, callback) {
 
 							text.x = newPageInfo.texts[k].x;
 							text.y = newPageInfo.texts[k].y;
+							text.w = newPageInfo.texts[k].w;
 
 							text.t = newPageInfo.texts[k].R[0].T;
 
@@ -223,7 +224,28 @@ function groupTextElementsByBoundsToArray(dayBoundsArray, textsArray) {
 		const dayObj = dayBoundsArray[i];
 
 		// First section the different possible columns
-		let dayGroups = textsArray.filter(textObj => textObj.x <= dayObj.x2 && textObj.x >= dayObj.x1);
+		let dayGroups = textsArray.filter(textObj => {
+			// Calculate the amount of overlap that the textObj has with the dayObj and consider it 
+			// in if has 50% overlap.
+			let textObjBeforeDayObj = textObj.x < dayObj.x1;
+
+			let x11 = textObjBeforeDayObj ? textObj.x : dayObj.x1;
+			let x21 = textObjBeforeDayObj ? textObj.x + textObj.w : dayObj.x2;
+			let x12 = textObjBeforeDayObj ? dayObj.x1 : textObj.x;
+			let x22 = textObjBeforeDayObj ? dayObj.x2 : textObj.x + textObj.w;
+
+			let overlapLength = x21 - x12;
+			let totalLength = x22 - x11;
+
+			// Check that there is no full enveloping occurring, and if so, return
+			// the appropriate value.
+			if (x12 < x11 && x21 < x22)
+				return textObjBeforeDayObj ? false : true;
+
+			// Otherwise, we just check that over 50% of the column is shared
+			return overlapLength / totalLength > 0.5;
+		});
+
 		groups.push(dayGroups);
 	}
 
