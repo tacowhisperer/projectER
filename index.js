@@ -164,12 +164,13 @@ function savePdfJsonToFile(serveryLocationName, callback) {
 						let menu = newPageInfo.groups;
 						pagesArray[j] = menu;
 					}
-                    let menu = reformatPageArrayToAppropraiteTitles(pagesArray);
-                    console.log("menu: " + JSON.stringify(menu, null, "\t"));
+
+					let menu = reformatPageArrayToAppropraiteTitles(pagesArray);
+
 					let pdfJsonObject = {
 						servery: removeCamelCase(currentLocation),
 						numPages: pagesArray.length,
-						pages: pagesArray
+						menu: menu
 					};
 
 					let descriptiveCallback = e => {
@@ -299,58 +300,42 @@ function reformatPageArrayToAppropraiteTitles(pageArray) {
     };
 
     let lunchEntres = {
-        monday: menu.lunch[MONDAY].filter(textObj =>
-                textObj.t !== "Monday"
-                && textObj.t !== "Lunch Menu"), //the first entry of the first page
-        tuesday: menu.lunch[TUESDAY].filter(textObj =>
-                textObj.t !== "Tuesday"
-                && textObj.t !== "Lunch Menu"),
-        wednesday: menu.lunch[WEDNESDAY].filter(textObj =>
-                textObj.t !== "Wednesday"
-                && textObj.t !== "Lunch Menu"),
-        thursday: menu.lunch[THURSDAY].filter(textObj =>
-                textObj.t !== "Thursday"
-                && textObj.t !== "Lunch Menu"),
-        friday: menu.lunch[FRIDAY].filter(textObj =>
-                textObj.t !== "Friday"
-                && textObj.t !== "Lunch Menu"),
-        saturday: menu.lunch[SATURDAY].filter(textObj =>
-                textObj.t !== "Saturday"
-                && textObj.t !== "Lunch Menu"),
-        sunday: menu.lunch[SUNDAY].filter(textObj =>
-                textObj.t !== "Sunday"
-                && textObj.t !== "Lunch Menu")
+        monday: menu.lunch[MONDAY].filter(mealLambda(["Monday", "Lunch Menu"], [/=/, /contains/i, /treenuts/i, /gluten/i, /soy/i])), //the first entry of the first page
+        tuesday: menu.lunch[TUESDAY].filter(mealLambda(["Tuesday", "Lunch Menu"], [/=/, /contains/i, /treenuts/i, /gluten/i, /soy/i])),
+        wednesday: menu.lunch[WEDNESDAY].filter(mealLambda(["Wednesday", "Lunch Menu"], [/=/, /contains/i, /treenuts/i, /gluten/i, /soy/i])),
+        thursday: menu.lunch[THURSDAY].filter(mealLambda(["Thursday", "Lunch Menu"], [/=/, /contains/i, /treenuts/i, /gluten/i, /soy/i])),
+        friday: menu.lunch[FRIDAY].filter(mealLambda(["Friday", "Lunch Menu"], [/=/, /contains/i, /treenuts/i, /gluten/i, /soy/i])),
+        saturday: menu.lunch[SATURDAY].filter(mealLambda(["Saturday", "Lunch Menu"], [/=/, /contains/i, /treenuts/i, /gluten/i, /soy/i])),
+        sunday: menu.lunch[SUNDAY].filter(mealLambda(["Sunday", "Lunch Menu"], [/=/, /contains/i, /treenuts/i, /gluten/i, /soy/i]))
     }
 
     let dinnerEntres = {
-        monday: menu.dinner[MONDAY].filter(textObj =>
-                textObj.t !== "Monday"
-                && textObj.t !== "Dinner Menu"), //the first entry of the first page
-        tuesday: menu.dinner[TUESDAY].filter(textObj =>
-                textObj.t !== "Tuesday"
-                && textObj.t !== "Dinner Menu"),
-        wednesday: menu.dinner[WEDNESDAY].filter(textObj =>
-                textObj.t !== "Wednesday"
-                && textObj.t !== "Dinner Menu"),
-        thursday: menu.dinner[THURSDAY].filter(textObj =>
-                textObj.t !== "Thursday"
-                && textObj.t !== "Dinner Menu"),
-        friday: menu.dinner[FRIDAY].filter(textObj =>
-                textObj.t !== "Friday"
-                && textObj.t !== "Dinner Menu"),
-        saturday: menu.dinner[SATURDAY].filter(textObj =>
-                textObj.t !== "Saturday"
-                && textObj.t !== "Dinner Menu"),
-        sunday: menu.dinner[SUNDAY].filter(textObj =>
-                textObj.t !== "Sunday"
-                && textObj.t !== "Dinner Menu")
+        monday: menu.dinner[MONDAY].filter(mealLambda(["Monday", "Dinner Menu"], [/=/, /contains/i, /treenuts/i, /gluten/i, /soy/i])), //the first entry of the first page
+        tuesday: menu.dinner[TUESDAY].filter(mealLambda(["Tuesday", "Dinner Menu"], [/=/, /contains/i, /treenuts/i, /gluten/i, /soy/i])),
+        wednesday: menu.dinner[WEDNESDAY].filter(mealLambda(["Wednesday", "Dinner Menu"], [/=/, /contains/i, /treenuts/i, /gluten/i, /soy/i])),
+        thursday: menu.dinner[THURSDAY].filter(mealLambda(["Thursday", "Dinner Menu"], [/=/, /contains/i, /treenuts/i, /gluten/i, /soy/i])),
+        friday: menu.dinner[FRIDAY].filter(mealLambda(["Friday", "Dinner Menu"], [/=/, /contains/i, /treenuts/i, /gluten/i, /soy/i])),
+        saturday: menu.dinner[SATURDAY].filter(mealLambda(["Saturday", "Dinner Menu"], [/=/, /contains/i, /treenuts/i, /gluten/i, /soy/i])),
+        sunday: menu.dinner[SUNDAY].filter(mealLambda(["Sunday", "Dinner Menu"], [/=/, /contains/i, /treenuts/i, /gluten/i, /soy/i]))
     }
 
     menu.lunch = lunchEntres;
     menu.dinner = dinnerEntres;
     return menu;
+
+    function mealLambda(literalsToRemoveArray, regexesToRemoveArray) {
+    	const literals = literalsToRemoveArray;
+    	const regexes = regexesToRemoveArray;
+
+    	return textObj => {
+    		let truth = true;
+    		for (let i = 0; i < literals.length; i++)
+    			truth = truth && (textObj.t !== literals[i]);
+
+    		for (let i = 0; i < regexes.length; i++)
+    			truth = truth && !textObj.t.match(regexes[i]);
+
+    		return truth;
+    	}
+    }
 }
-
-
-
-
