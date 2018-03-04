@@ -22,23 +22,30 @@ const DINNER = 2;
 const SAME_LINE_THRESH = 0.8
 
 
-app.set('port', (process.env.PORT || 5000));
-
-app.get('/', (request, response) => {
-    response.send("Hello!");
-})
-
-
-app.get('/Andres', (request, response) => {
-    response.send("Hello Andres!");
-})
-
-
 // Holds the different PDF JSON objects
 let serveryJsonObjects;
 
 const unNeededTextArray = ["L", "G", "V", "VG", "vg", "v", "SF", "F", "M", "E", "g", "sf", "m", "e", "p", "P", "tn", "TN"];
 
+finish(() => {
+	app.set('port', (process.env.PORT || 5000));
+
+	app.get('/', (request, response) => {
+	    response.send("Hello!");
+	});
+
+	app.get('/Andres', (request, response) => {
+		response.send("finished");
+	});
+
+	app.get('/WeeklyMenu', (request, response) => {
+	    response.send(serveryJsonObjects);
+	});
+
+	app.listen(app.get('port'), () => {
+	    console.log('running on port', app.get('port'));
+	});
+});
 
 http.get(DINING_URL, response => {
 	let diningHTML = "";
@@ -106,7 +113,7 @@ function savePdfToFile(pdfUrls, pdfProcessor) {
 	}
 }
 
-function savePdfJsonToFile(serveryLocationName, callback) {
+function savePdfJsonToFile(serveryLocationName, initializeServerCallback) {
 	let pdfParser = new PDFParser();
 	const currentLocation = serveryLocationName;
 
@@ -183,9 +190,35 @@ function savePdfJsonToFile(serveryLocationName, callback) {
 						} else
 							console.log("Successfully wrote '" + fileName + "' to file.");
 					};
+
 					// Save the condensed information to currentLocation.pdf
 					fs.writeFile(MENU_FOLDER + currentLocation + ".json",
 						JSON.stringify(pdfJsonObject, null, "\t"), "utf8", descriptiveCallback);
+
+					// Indicate that the current location has been created
+					switch (currentLocation) {
+						case "baker":
+							serveryJsonObjects[0] = pdfJsonObject;
+							break;
+						case "north":
+							serveryJsonObjects[1] = pdfJsonObject;
+							break;
+						case "seibel":
+							serveryJsonObjects[2] = pdfJsonObject;
+							break;
+						case "sidRich":
+							serveryJsonObjects[3] = pdfJsonObject;
+							break;
+						case "south":
+							serveryJsonObjects[4] = pdfJsonObject;
+							break;
+						case "west":
+							serveryJsonObjects[5] = pdfJsonObject;
+							break;
+						default:
+							console.log("Unknown location encountered: \"" + currentLocation + "\"");
+							break;
+					}
 				}
 			});
 	});
@@ -271,15 +304,6 @@ function removeCamelCase(str) {
 		" " + (typeof(p1) == "string" ? p1 : "") + (typeof(p2) == "string" ? p2 : ""));
 }
 
-app.get('/WeeklyMenu', (request, response) => {
-    response.send(serveryJsonObjects);
-})
-
-app.listen(app.get('port'), () => {
-    console.log('running on port', app.get('port'));
-})
-
-
 function condenseAndOrderGroupsArraysTextElements(groupArray) {
 	// First remove all of the V, VG, P, etc.
 	for (let i = 0; i < groupArray.length; i++)
@@ -289,7 +313,6 @@ function condenseAndOrderGroupsArraysTextElements(groupArray) {
 	for (let i = 0; i < groupArray.length; i++)
 		groupArray[i].sort((a, b) => a.y - b.y);
 }
-
 
 function reformatPageArrayToAppropraiteTitles(pageArray) {
 
@@ -365,4 +388,28 @@ function formatMenuEntreesForFinalOutput(menu) {
 			weeklyScheduleObj[dayOfTheWeek] = formattedStringArray;
 		}
 	}
+}
+
+function finish(callback) {
+	let timeoutID = 0;
+
+	timeoutID = setTimeout(() => {
+		let ready = true;
+
+		if (serveryJsonObjects instanceof Array) {
+			for (let i = 0; i < serveryJsonObjects.length; i++) {
+				if (serveryJsonObjects[i] == null) {
+					ready = false;
+					break;
+				}
+			}
+		} else
+			ready = false;
+
+		if (ready) {
+			clearTimeout(timeoutID);
+			callback();
+		} else
+			timeoutID = setTimeout(finish, 1, callback);
+	}, 1);
 }
