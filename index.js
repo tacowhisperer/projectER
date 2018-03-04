@@ -5,9 +5,24 @@ const PDFParser = require('pdf2json');
 
 const DINING_URL = "http://dining.rice.edu/undergraduate-dining/college-serveries/weekly-menus/";
 const MENU_FOLDER = "./menu_pdfs/";
+const RICE_BLUE = "#16355b";
+const MONDAY = 0;
+const TUESDAY = 1;
+const WEDNESDAY = 2;
+const THURSDAY = 3;
+const FRIDAY = 4;
+const SATURDAY = 5;
+const SUNDAY = 6;
+const LABEL_STRLEN = 2;
+const LUNCH = 1;
+const DINNER = 2;
+const SAME_LINE_THRESH = 0.8
 
 // Holds the different PDF JSON objects
 let serveryJsonObjects;
+
+const unNeededTextArray = ["L", "G", "V", "VG", "vg", "v", "SF", "F", "M", "E", "g", "sf", "m", "e", "p", "P", "tn", "TN"];
+
 
 http.get(DINING_URL, response => {
 	let diningHTML = "";
@@ -38,7 +53,6 @@ http.get(DINING_URL, response => {
 		// Save the PDF file as-is given from the Rice Dining website.
         	savePdfToFile(pdfUrls, savePdfJsonToFile);
 	});
-
 }).on("error", e => console.error("GET REQUEST ERROR: " + e.message));
 
 function getPdfUrlOf(buildingName, diningHTML) {
@@ -78,6 +92,7 @@ function savePdfToFile(pdfUrls, pdfProcessor) {
 
 function savePdfJsonToFile(serveryLocationName, callback) {
 	let pdfParser = new PDFParser();
+	const currentLocation = serveryLocationName;
 
 	pdfParser.on("pdfParser_dataError", e => {
 		console.error("Error parsing '" + serveryLocationName + ".pdf':");
@@ -85,65 +100,143 @@ function savePdfJsonToFile(serveryLocationName, callback) {
 	});
 
 	pdfParser.on("pdfParser_dataReady", rawPdfJsonObject => {
-		const currentLocation = serveryLocationName;
+		// Sort the text elements based on x-coordinate
+		for (let i = 0; i < rawPdfJsonObject.formImage.Pages.length; i++)
+			rawPdfJsonObject.formImage.Pages[i].Texts.sort((a, b) => a.x > b.x ? 1 : a.x < b.x ? -1 : 0);
 
-		// Stores the Pages array "as-is" from the pdf2json function call.
-		let pagesArray = rawPdfJsonObject.formImage.Pages;
-		for (let j = 0; j < pagesArray.length; j++) {
-			let pageInfoObj = pagesArray[j];
+		// Save the complete (sorted) information to currentLocation.uncompressed.pdf for research purposes, then proceed to
+		// compress the information for boundary calculations.
+		fs.writeFile(MENU_FOLDER + currentLocation + ".uncompressed.json",
+			JSON.stringify(rawPdfJsonObject, null, "\t"), "utf8", e => {
+				if (e)
+					console.error(e.message);
+				else {
+					console.log("Successfully saved '" + currentLocation + ".uncompressed.json' to file.");
 
-			// Stores the condensed information from the raw pdf2json object.
-			let newPageInfo = {};
+					// Stores the Pages array "as-is" from the pdf2json function call.
+					let pagesArray = rawPdfJsonObject.formImage.Pages;
+					for (let j = 0; j < pagesArray.length; j++) {
+						let pageInfoObj = pagesArray[j];
 
-			newPageInfo.height = pageInfoObj.Height;
-			newPageInfo.texts = pageInfoObj.Texts;
+						// Stores the condensed information from the raw pdf2json object.
+						let newPageInfo = {};
+						newPageInfo.texts = pageInfoObj.Texts;
 
-			for (let k = 0; k < newPageInfo.texts.length; k++) {
-				// Stores only the necessary information for each text block.
-				let text = {};
+						// Only leave the fills that correspond to day entries (Monday, Tuesday, etc.)
+						newPageInfo.dayBounds = processDayBoundObjectArray(pageInfoObj.Fills);
 
-				text.x = newPageInfo.texts[k].x;
-				text.y = newPageInfo.texts[k].y;
-				text.ts = newPageInfo.texts[k].R[0].TS;
-				text.t = newPageInfo.texts[k].R[0].T;
+						for (let k = 0; k < newPageInfo.texts.length; k++) {
+							// Stores only the necessary information for each text block.
+							let text = {};
 
-				text.t = decodeURIComponent(text.t);
+							text.x = newPageInfo.texts[k].x;
+							text.y = newPageInfo.texts[k].y;
 
-				// Override the raw data with the compressed data
-				newPageInfo.texts[k] = text;
-			}
+							text.t = newPageInfo.texts[k].R[0].T;
 
-			pagesArray[j] = newPageInfo;
-		}
+							// Converts %20 to spaces.
+							text.t = decodeURIComponent(text.t);
 
-		let pdfJsonObject = {
-			servery: removeCamelCase(currentLocation),
-			numPages: pagesArray.length,
-			pages: pagesArray
-		};
+							// Override the raw data with the compressed data
+							newPageInfo.texts[k] = text;
+						}
 
-		let descriptiveCallback = e => {
-			const fileName = currentLocation + ".json";
+						newPageInfo.groups = groupTextElementsByBoundsToArray(newPageInfo.dayBounds, newPageInfo.texts);
+						condenseAndOrderGroupsArraysTextElements(newPageInfo.groups);
 
-			if (e) {
-				console.error("Error writing '" + fileName + "' to file.");
-				console.error(e.message);
-			} else
-				console.log("Successfully wrote '" + fileName + "' to file.");
-		};
-		
-		fs.writeFile(MENU_FOLDER + currentLocation + ".json",
-			JSON.stringify(pdfJsonObject, null, "\t"), "utf8", descriptiveCallback);
+						let menu = newPageInfo.groups;
+						pagesArray[j] = menu;
+					}
+
+					let pdfJsonObject = {
+						servery: removeCamelCase(currentLocation),
+						numPages: pagesArray.length,
+						pages: pagesArray
+					};
+
+					let descriptiveCallback = e => {
+						const fileName = currentLocation + ".json";
+
+						if (e) {
+							console.error("Error writing '" + fileName + "' to file.");
+							console.error(e.message);
+						} else
+							console.log("Successfully wrote '" + fileName + "' to file.");
+					};
+					
+					// Save the condensed information to currentLocation.pdf
+					fs.writeFile(MENU_FOLDER + currentLocation + ".json",
+						JSON.stringify(pdfJsonObject, null, "\t"), "utf8", descriptiveCallback);
+				}
+			});
 	});
 
 	pdfParser.loadPDF(MENU_FOLDER + serveryLocationName + ".pdf");
 }
 
-function clump(pdfJsonObject, index) {
-	let daysOfWeek = 5;
+function processDayBoundObjectArray(pageFillsArray) {
+	// Only work with the colored box bounds given to each day of the week
+	let stage1 = pageFillsArray.filter(fillObj => fillObj.oc === RICE_BLUE);
+
+	// Convert the bounds to usable coordinates
+	let stage2 = stage1.map(fillObj => {
+		return {
+			day: "TBD",
+			x1: fillObj.x,
+			x2: fillObj.x + fillObj.w,
+			y1: fillObj.y,
+			y2: fillObj.y + fillObj.h
+		};
+	});
+
+	// Ensure that Monday -> 0, Tuesday -> 1, etc. based on coordinate positions
+	stage2.sort((a, b) => a.y < b.y ? -1 : a.y > b.y ? 1 : a.x < b.x ? -1 : a.x > b.x ? 1 : 0);
+
+	// Convert "TBD" to their respective day
+	const dayIndices = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+
+	for (let i = 0; i < stage2.length; i++)
+		stage2[i].day = dayIndices[i];
+
+	return stage2;
+}
+
+function groupTextElementsByBoundsToArray(dayBoundsArray, textsArray) {
+	var groups = [];
+	for (let i = 0; i < dayBoundsArray.length; i++) {
+		const dayObj = dayBoundsArray[i];
+
+		// First section the different possible columns
+		let dayGroups = textsArray.filter(textObj => textObj.x <= dayObj.x2 && textObj.x >= dayObj.x1);
+		groups.push(dayGroups);
+	}
+
+	if (dayBoundsArray.length > 0) {
+		// Then filter each dayGroups with values that must belong in the respective column.
+		const bottomRowYCoordinate = dayBoundsArray[THURSDAY].y1;
+		for (let day = 0; day < groups.length; day++) {
+			if (day < THURSDAY) {
+				groups[day] = groups[day].filter(textObj => textObj.y < bottomRowYCoordinate);
+			} else {
+				groups[day] = groups[day].filter(textObj => textObj.y > bottomRowYCoordinate);
+			}
+		}
+	}
+
+	return groups;
 }
 
 function removeCamelCase(str) {
 	return str.charAt(0).toUpperCase() + str.slice(1).replace(/([A-Z])([A-Z]*)/g, (match, p1, p2) =>
 		" " + (typeof(p1) == "string" ? p1 : "") + (typeof(p2) == "string" ? p2 : ""));
+}
+
+function condenseAndOrderGroupsArraysTextElements(groupArray) {
+	// First remove all of the V, VG, P, etc.
+	for (let i = 0; i < groupArray.length; i++)
+		groupArray[i] = groupArray[i].filter(textObj => textObj.t.replace(/\s/g, "").length > LABEL_STRLEN);
+
+	// Then we sort the text elements so that they are in the order that they are presented in the pdf
+	for (let i = 0; i < groupArray.length; i++)
+		groupArray[i].sort((a, b) => a.y - b.y);
 }
