@@ -166,6 +166,7 @@ function savePdfJsonToFile(serveryLocationName, callback) {
 					}
 
 					let menu = reformatPageArrayToAppropraiteTitles(pagesArray);
+					formatMenuEntreesForFinalOutput(menu);
 
 					let pdfJsonObject = {
 						servery: removeCamelCase(currentLocation),
@@ -279,8 +280,6 @@ app.listen(app.get('port'), () => {
 })
 
 
-
-
 function condenseAndOrderGroupsArraysTextElements(groupArray) {
 	// First remove all of the V, VG, P, etc.
 	for (let i = 0; i < groupArray.length; i++)
@@ -338,4 +337,32 @@ function reformatPageArrayToAppropraiteTitles(pageArray) {
     		return truth;
     	}
     }
+}
+
+function formatMenuEntreesForFinalOutput(menu) {
+	for (let mealtime in menu) {
+		let weeklyScheduleObj = menu[mealtime];
+
+		for (let dayOfTheWeek in weeklyScheduleObj) {
+			let dayEntreeTextObjArray = weeklyScheduleObj[dayOfTheWeek];
+			let formattedStringArray = [];
+
+			// Add the first textObj text to the array if it exists
+			if (dayEntreeTextObjArray.length > 0)
+				formattedStringArray.push(dayEntreeTextObjArray[0].t);
+
+			for (let i = 1; i < dayEntreeTextObjArray.length; i++) {
+				let currTextObj = dayEntreeTextObjArray[i];
+				let prevTextObj = dayEntreeTextObjArray[i - 1];
+
+				if (currTextObj.y - prevTextObj.y < SAME_LINE_THRESH) {
+					formattedStringArray[formattedStringArray.length - 1] += currTextObj.t;
+				} else {
+					formattedStringArray.push(currTextObj.t);
+				}
+			}
+
+			weeklyScheduleObj[dayOfTheWeek] = formattedStringArray;
+		}
+	}
 }
