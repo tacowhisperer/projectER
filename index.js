@@ -27,22 +27,33 @@ let serveryJsonObjects;
 
 // Waits for all dining location PDF files to be converted to usable JSON objects to start listening for requests.
 finish(() => {
+	// Generate the weekly menu JSON object from the serveryJsonObjects array
+	let weeklyMenu = generateWeeklyMenu(serveryJsonObjects);
+
 	app.set('port', (process.env.PORT || 5000));
 
 	app.get('/', (request, response) => {
-	    response.send("Hello!");
+		response.type('html');
+		response.send("<h1>Welcome to Project-ER!</h1><br><h2>API:</h2><br><p>tbd</p>");
 	});
 
 	app.get('/Andres', (request, response) => {
+		response.type('html');
 		response.send("finished");
 	});
 
+	app.get('/Jade', (request, response) => {
+		response.type('html');
+		response.send("finished");
+	})
+
 	app.get('/WeeklyMenu', (request, response) => {
-	    response.send(serveryJsonObjects);
+		response.type('json');
+		response.send(weeklyMenu);
 	});
 
 	app.listen(app.get('port'), () => {
-	    console.log('running on port', app.get('port'));
+		console.log('running on port', app.get('port'));
 	});
 });
 
@@ -135,8 +146,19 @@ function savePdfJsonToFile(serveryLocationName, initializeServerCallback) {
 				else {
 					console.log("Successfully saved '" + currentLocation + ".uncompressed.json' to file.");
 
-					// Stores the Pages array "as-is" from the pdf2json function call.
-					let pagesArray = rawPdfJsonObject.formImage.Pages;
+					// Stores a deep copy of the Pages array (removing %20 from text) from the pdf2json function call.
+					let pagesArray = JSON.parse(JSON.stringify(rawPdfJsonObject.formImage.Pages.map(page => {
+						let newPage = page;
+						newPage.Texts = newPage.Texts.map(textObj => {
+							let newTextObj = textObj;
+							newTextObj.R[0].T = decodeURIComponent(newTextObj.R[0].T);
+
+							return newTextObj;
+						});
+
+						return newPage;
+					})));
+
 					for (let j = 0; j < pagesArray.length; j++) {
 						let pageInfoObj = pagesArray[j];
 
@@ -154,11 +176,7 @@ function savePdfJsonToFile(serveryLocationName, initializeServerCallback) {
 							text.x = newPageInfo.texts[k].x;
 							text.y = newPageInfo.texts[k].y;
 							text.w = newPageInfo.texts[k].w;
-
 							text.t = newPageInfo.texts[k].R[0].T;
-
-							// Converts %20 to spaces.
-							text.t = decodeURIComponent(text.t);
 
 							// Override the raw data with the compressed data
 							newPageInfo.texts[k] = text;
@@ -174,11 +192,9 @@ function savePdfJsonToFile(serveryLocationName, initializeServerCallback) {
 					let menu = reformatPageArrayToAppropraiteTitles(pagesArray);
 					formatMenuEntreesForFinalOutput(menu);
 
-					getChefName(pagesArray); // Note: does not do anything right now, just logs information.
-
 					let pdfJsonObject = {
 						servery: removeCamelCase(currentLocation),
-						// numPages: pagesArray.length,
+						chef: getChefName(rawPdfJsonObject.formImage.Pages),
 						menu: menu
 					};
 
@@ -389,8 +405,38 @@ function formatMenuEntreesForFinalOutput(menu) {
 }
 
 function getChefName(pagesArray) {
-	console.log("First Page Array: ");
-	console.log(pagesArray[0]);
+	const SAME_Y_COORDINATE_THRESH = 0.0001;
+	let firstPage = pagesArray[0];
+
+	// Ensure that the text elements are sorted in ascending y coordinate value
+	firstPage.Texts.sort((a, b) => a.y - b.y);
+
+	// Find the lowest y-coordinate value
+	let lowestYValue = 0;
+	for (let i = 0; i < firstPage.Texts.length; i++)
+		if (firstPage.Texts[i].y > lowestYValue)
+			lowestYValue = firstPage.Texts[i].y;
+
+	// Only leave the lowest text elements in the array (these contain the chef name), then extract and join those strings.
+	let chefName = firstPage.Texts.filter(textObj => Math.abs(textObj.y - lowestYValue) <= SAME_Y_COORDINATE_THRESH)
+		.map(textObj => textObj.R[0].T)
+		.join(" ");
+
+	return chefName;
+}
+
+function generateWeeklyMenu(serveryJsonObjectsArray) {
+	let weeklyMenu = {};
+
+	for (let i = 0; i < serveryJsonObjectsArray.length; i++) {
+		let serveryJson = serveryJsonObjectsArray[i];
+
+		weeklyMenu[serveryJson.servery] = {};
+		weeklyMenu[serveryJson.servery].chef = serveryJson.chef;
+		weeklyMenu[serveryJson.servery].menu = serveryJson.menu;
+	}
+
+	return weeklyMenu;
 }
 
 function finish(callback) {
