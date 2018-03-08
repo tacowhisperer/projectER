@@ -27,6 +27,12 @@ const daysOfTheWeek = ["sunday", "monday", "tuesday", "wednesday", "thursday", "
 
 // Holds the response page for the / GET request
 const welcomeHTML = fs.readFileSync('resources/index.html', 'utf8');
+const welcomeCSS = fs.readFileSync('resources/index.css', 'utf8');
+const weeklyMenuHTML = fs.readFileSync('resources/weeklymenu.html', 'utf8');
+const todayMenuHTML = fs.readFileSync('resources/todaymenu.html', 'utf8');
+const locationMenuHTML = fs.readFileSync('resources/locationmenu.html', 'utf8');
+const favicon = fs.readFileSync('resources/favicon.ico');
+
 
 // Holds the server that listens to new requests
 let server = null;
@@ -130,6 +136,31 @@ function start() {
 		app.get('/', (request, response) => {
 			response.type('html');
 			response.send(welcomeHTML);
+		});
+
+		app.get(/(resources)?\/?index\.css/i, (request, response) => {
+			response.type('css');
+			response.send(welcomeCSS);
+		});
+
+		app.get(/(resources)?\/?weeklymenu\.html/i, (request, response) => {
+			response.type('html');
+			response.send(weeklyMenuHTML);
+		});
+
+		app.get(/(resources)?\/?todaymenu\.html/i, (request, response) => {
+			response.type('html');
+			response.send(todayMenuHTML);
+		});
+
+		app.get(/(resources)?\/?locationmenu\.html/i, (request, response) => {
+			response.type('html');
+			response.send(locationMenuHTML);
+		});
+
+		app.get(/.*favicon\.ico/, (request, response) => {
+			response.type('ico');
+			response.send(favicon);
 		});
 
 		app.get('/Andres', (request, response) => {
