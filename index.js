@@ -20,73 +20,94 @@ const LABEL_STRLEN = 2;
 const LUNCH = 1;
 const DINNER = 2;
 const SAME_LINE_THRESH = 0.8
+const DINING_UPDATE_INTERVAL_MS = 1000 /*ms*/ * 60 /*secs*/ * 60 /*mins*/;
 
+// Holds the response page for the / GET request
+const welcomeHTML = fs.readFileSync('resources/index.html', 'utf8');
+
+// Holds the server that listens to new requests
+let server = null;
 
 // Holds the different, final PDF JSON objects that will be deployed to the API users
 let serveryJsonObjects;
 
-// Waits for all dining location PDF files to be converted to usable JSON objects to start listening for requests.
-finish(() => {
-	// Generate the weekly menu JSON object from the serveryJsonObjects array
-	let weeklyMenu = generateWeeklyMenu(serveryJsonObjects);
+// Holds the response to the /WeeklyMenu GET request
+let weeklyMenu;
 
-	app.set('port', (process.env.PORT || 5000));
+// Starts the menu processing callback chain.
+start();
 
-	app.get('/', (request, response) => {
-		response.type('html');
-		response.send("<h1>Welcome to Project-ER!</h1><br><h2>API:</h2><br><p>tbd</p>");
+// Sets the chain to restart every hour.
+setInterval(start, DINING_UPDATE_INTERVAL_MS);
+
+function start() {
+	// Waits for all dining location PDF files to be converted to usable JSON objects to start listening for requests.
+	finish(() => {
+		// Generate the weekly menu JSON object from the serveryJsonObjects array
+		weeklyMenu = generateWeeklyMenu(serveryJsonObjects);
+
+		// Close any previously running express servers
+		if (server != null)
+			server.close();
+
+		app.set('port', (process.env.PORT || 5000));
+
+		app.get('/', (request, response) => {
+			response.type('html');
+			response.send(welcomeHTML);
+		});
+
+		app.get('/Andres', (request, response) => {
+			response.type('html');
+			response.send("finished");
+		});
+
+		app.get('/Jade', (request, response) => {
+			response.type('html');
+			response.send("finished");
+		})
+
+		app.get('/WeeklyMenu', (request, response) => {
+			response.type('json');
+			response.send(weeklyMenu);
+		});
+
+		server = app.listen(app.get('port'), () => {
+			console.log('running on port', app.get('port'));
+		});
 	});
 
-	app.get('/Andres', (request, response) => {
-		response.type('html');
-		response.send("finished");
-	});
+	http.get(DINING_URL, response => {
+		let diningHTML = "";
 
-	app.get('/Jade', (request, response) => {
-		response.type('html');
-		response.send("finished");
-	})
+		console.log("Response statuscode: " + response.statusCode);
+		console.log("Content:\n\n");
 
-	app.get('/WeeklyMenu', (request, response) => {
-		response.type('json');
-		response.send(weeklyMenu);
-	});
+		response.setEncoding("utf8");
+		response.on("data", chunk => diningHTML += chunk);
 
-	app.listen(app.get('port'), () => {
-		console.log('running on port', app.get('port'));
-	});
-});
+		response.on("end", () => {
+			let pdfUrls = {
+				baker: getPdfUrlOf("Baker", diningHTML),
+				north: getPdfUrlOf("North", diningHTML),
+				seibel: getPdfUrlOf("Seibel", diningHTML),
+				sidRich: getPdfUrlOf("Sid Rich", diningHTML),
+				south: getPdfUrlOf("South", diningHTML),
+				west: getPdfUrlOf("West", diningHTML)
+			};
 
-http.get(DINING_URL, response => {
-	let diningHTML = "";
+			let serveryKeys = Object.keys(pdfUrls);
 
-	console.log("Response statuscode: " + response.statusCode);
-	console.log("Content:\n\n");
+			// Initialize the array that will allow synchronization to occur later.
+			serveryJsonObjects = new Array(serveryKeys.length);
+			for (let i = 0; i < serveryKeys.length; i++)
+				serveryJsonObjects[i] = null;
 
-	response.setEncoding("utf8");
-	response.on("data", chunk => diningHTML += chunk);
-
-	response.on("end", () => {
-		let pdfUrls = {
-			baker: getPdfUrlOf("Baker", diningHTML),
-			north: getPdfUrlOf("North", diningHTML),
-			seibel: getPdfUrlOf("Seibel", diningHTML),
-			sidRich: getPdfUrlOf("Sid Rich", diningHTML),
-			south: getPdfUrlOf("South", diningHTML),
-			west: getPdfUrlOf("West", diningHTML)
-		};
-
-		let serveryKeys = Object.keys(pdfUrls);
-
-		// Initialize the array that will allow synchronization to occur later.
-		serveryJsonObjects = new Array(serveryKeys.length);
-		for (let i = 0; i < serveryKeys.length; i++)
-			serveryJsonObjects[i] = null;
-
-		// Save the PDF file as-is given from the Rice Dining website.
-        	savePdfToFile(pdfUrls, savePdfJsonToFile);
-	});
-}).on("error", e => console.error("GET REQUEST ERROR: " + e.message));
+			// Save the PDF file as-is given from the Rice Dining website.
+	        	savePdfToFile(pdfUrls, savePdfJsonToFile);
+		});
+	}).on("error", e => console.error("GET REQUEST ERROR: " + e.message));
+}
 
 function getPdfUrlOf(buildingName, diningHTML) {
 	let regex = new RegExp("<p>(\\r\\n\\s)*<a href=\"([^\"]+)\" target=\"_blank\" rel=\"noopener\">" + buildingName + "<\\/a>");
@@ -426,17 +447,17 @@ function getChefName(pagesArray) {
 }
 
 function generateWeeklyMenu(serveryJsonObjectsArray) {
-	let weeklyMenu = {};
+	let weeklyMenuTemp = {};
 
 	for (let i = 0; i < serveryJsonObjectsArray.length; i++) {
 		let serveryJson = serveryJsonObjectsArray[i];
 
-		weeklyMenu[serveryJson.servery] = {};
-		weeklyMenu[serveryJson.servery].chef = serveryJson.chef;
-		weeklyMenu[serveryJson.servery].menu = serveryJson.menu;
+		weeklyMenuTemp[serveryJson.servery] = {};
+		weeklyMenuTemp[serveryJson.servery].chef = serveryJson.chef;
+		weeklyMenuTemp[serveryJson.servery].menu = serveryJson.menu;
 	}
 
-	return weeklyMenu;
+	return weeklyMenuTemp;
 }
 
 function finish(callback) {
