@@ -11,12 +11,18 @@
 	<link href="https://fonts.googleapis.com/css?family=Ubuntu+Mono" rel="stylesheet"/>
 
 	<!-- Mobile website support -->
-	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=yes"/>
+	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no"/>
 
 	<!-- Page CSS -->
 	<link href="resources/index.css" rel="stylesheet"/>
 
+	<!-- Fixes the awkward sizes of the JSON sample blocks. -->
 	<script>
+		const IDEAL_WIDTH = 600;
+
+		let apiSamples = [];
+		let apiSampleIdx = 0;
+
 		window.onload = () => {
 			// Attach the example JSON to the /WeeklyMenu list entry
 			loadHtmlFile("resources/weeklymenu.html", document.getElementById("weeklymenuapi"));
@@ -26,27 +32,67 @@
 
 			// Attach the example JSON to the /Baker, /North, /Seibel, /SidRich/ South, and /West list entry
 			loadHtmlFile("resources/locationmenu.html", document.getElementById("locationmenuapi"));
+		
+			// Wait until all async requests have completed to commence resizing handlers
+			finish(() => {
+				// Handle the awkward widths of the JSON text boxes
+				window.onresize = () => {
+					for (let i = 0; i < apiSamples.length; i++) {
+						let apiSample = apiSamples[i];
+						let apiSampleRect = apiSample.getBoundingClientRect();
+
+						apiSample.style.width = Math.min(window.innerWidth - 2 * apiSampleRect.x, IDEAL_WIDTH) + "px";
+					}
+				};
+
+				// Fire a resize event so that the elements are sized correctly upon initiation
+				window.dispatchEvent(new Event("resize"));
+			});
 		};
 
 		function loadHtmlFile(htmlPath, targetElement) {
 			let xhttp = new XMLHttpRequest();
+			const targetIdx = apiSampleIdx++;
 
-			xhttp.onreadystatechange = function() {
-				if (this.readyState == 4 && this.status == 200) {
-					// Create the new element to be appended to the target element
-					let newElement = document.createElement("p");
+			// Register the new entry in the apiSamples array.
+			apiSamples[targetIdx] = null;
 
-					// Set the element's attributes
-					newElement.innerHTML = this.responseText;
+			// Delaying sending the request allows the finish function a chance to detect that a new entry has been added
+			setTimeout(() => {
+				xhttp.onreadystatechange = function() {
+					if (this.readyState == 4 && this.status == 200) {
+						// Create the new element to be appended to the target element
+						let newElement = document.createElement("p");
 
-					// Append it to the end of the target element.
-					while (newElement.firstChild)
-						targetElement.appendChild(newElement.firstChild);
+						// Set the element's attributes
+						newElement.innerHTML = this.responseText;
+
+						// Append it to the end of the target element.
+						while (newElement.firstChild)
+							targetElement.appendChild(newElement.firstChild);
+
+						apiSamples[targetIdx] = targetElement.lastChild;
+					}
+				};
+
+				xhttp.open("GET", htmlPath, true);
+				xhttp.send();
+			}, 5);
+		}
+
+		function finish(callback) {
+			let ready = apiSamples.length;
+			for (let i = 0; i < apiSamples.length; i++) {
+				if (apiSamples[i] == null || apiSamples[i] == undefined) {
+					ready = false;
+					break;
 				}
-			};
+			}
 
-			xhttp.open("GET", htmlPath, true);
-			xhttp.send();
+			if (ready) 
+				callback();
+			else
+				setTimeout(finish, 1, callback);
 		}
 	</script>
 </head>
