@@ -4,123 +4,96 @@
 <html>
 
 <head>
+	<!-- Favicon! -->
+	<link href="resources/favicon.ico" rel="icon"/>
+
 	<!-- Get the Ubuntu Monospace font from Google Fonts -->
 	<link href="https://fonts.googleapis.com/css?family=Ubuntu+Mono" rel="stylesheet"/>
 
-	<style type="text/css">
-		body {
-			font-family: 'Ubuntu Mono', Consolas, monospace;
-			margin: 0;
-			padding: 1em;
-		}
+	<!-- Page CSS -->
+	<link href="resources/index.css" rel="stylesheet"/>
 
-		.boldtext {
-			font-size: 0.85em;
-		}
+	<script>
+		window.onload = () => {
+			// Attach the example JSON to the /WeeklyMenu list entry
+			loadHtmlFile("resources/weeklymenu.html", document.getElementById("weeklymenuapi"));
 
-		.getrequest {
-			background-color: #eee;
-			font-family: "Courier New", Courier, monospace;
-			font-size: 0.90em;
-			outline: 1px solid #ccc;
-			padding: 0.35em;
-		}
+			// Attach the example JSON to the /Today list entry
+			loadHtmlFile("resources/todaymenu.html", document.getElementById("todaymenuapi"));
 
-		h1 {
-			margin: 0;
-			padding: 0;
-		}
+			// Attach the example JSON to the /Baker, /North, /Seibel, /SidRich/ South, and /West list entry
+			loadHtmlFile("resources/locationmenu.html", document.getElementById("locationmenuapi"));
+		};
 
-		h3 {
-			margin: 0;
-			padding: 0;
-		}
+		function loadHtmlFile(htmlPath, targetElement) {
+			let xhttp = new XMLHttpRequest();
 
-		.jsontextbox {
-			background-color: #f5f5f5;
-			display: inline-block;
-			height: 20em;
-			overflow: auto;
-			padding: 1em;
-		}
+			xhttp.onreadystatechange = function() {
+				if (this.readyState == 4 && this.status == 200) {
+					// Create the new element to be appended to the target element
+					let newElement = document.createElement("p");
 
-		li {
-			line-height: 1.5em;
+					// Set the element's attributes
+					newElement.innerHTML = this.responseText;
+
+					// Append it to the end of the target element.
+					while (newElement.firstChild)
+						targetElement.appendChild(newElement.firstChild);
+				}
+			};
+
+			xhttp.open("GET", htmlPath, true);
+			xhttp.send();
 		}
-	</style>
+	</script>
 </head>
 
 <body>
-	<h1>Welcome to Project Eat Rice!</h1>
-	<p>This is currently a work-in-progress server that takes the weekly servery menus found <a href="http://dining.rice.edu/undergraduate-dining/college-serveries/weekly-menus/" target="_blank">here</a>, and converts them into easy-to-process JSON files, which are outlined in greater detail below.</p>
+	<h1>Welcome to Project-ER!</h1>
+	<p>Project-ER (Project Eat Rice) is a work-in-progress server that takes the weekly servery menus found <a class="referencelink boldtext" href="http://dining.rice.edu/undergraduate-dining/college-serveries/weekly-menus/" target="_blank">here</a>, and then converts them from PDF format into an easy-to-process JSON format.</p>
+	<p>The server is written in JavaScript using <a class="referencelink boldtext" href="https://nodejs.org/en/" target="_blank">Node.js</a> + <a class="referencelink boldtext" href="https://expressjs.com/" target="_blank">Express</a> + <a class="referencelink boldtext" href="https://www.npmjs.com/package/download" target="_blank">download-file</a> + <a class="referencelink boldtext" href="https://www.npmjs.com/package/pdf2json" target="_blank">pdf2json</a>. The source code for the service can be found <a class="referencelink boldtext" href="https://github.com/tacowhisperer/projectER" target="_blank">here</a>.</p>
 
 	<br>
 
 	<h3>API Usage</h3>
 	<p>The list below shows the different GET requests and outputs of those requests. Note that keys in the sample JSON objects shown mean that they can be any valid JSON string (bold keys should be interpreted literally).</p>
 	<ul>
-		<li>
-			<span class="getrequest">&#47;WeeklyMenu</span>: Returns an JSON object (<span class="boldtext"><b>application/json</b></span>) of the weekly menu for all serveries that have a weekly menu PDF <a href="http://dining.rice.edu/undergraduate-dining/college-serveries/weekly-menus/" target="_blank">here</a>. The format of this JSON object is as follows:
+		<li id="weeklymenuapi">
+			<a class="getrequest" href="/WeeklyMenu" target="_blank">&#47;WeeklyMenu</a>: Returns a JSON object (<span class="boldtext">application/json</span>) of the weekly menu for all serveries that have a weekly menu PDF <a href="http://dining.rice.edu/undergraduate-dining/college-serveries/weekly-menus/" target="_blank">here</a>. The format of this JSON object is as follows:
 
 			<br>
-
-			<pre class="jsontextbox">
-{
-	"Servery Name 1": {
-		<b>"chef"</b>: "Chef Name",
-		<b>"menu"</b>: {
-			<b>"lunch"</b>: {
-				<b>"monday"</b>: [
-					"Entreé 1",
-					"Entreé 2",
-					...
-				],
-				<b>"tuesday"</b>: [
-					"Entreé 1",
-					"Entreé 2",
-					...
-				],
-				<b>"wednesday"</b>: [
-					"Entreé 1",
-					"Entreé 2",
-					...
-				],
-				<b>"thursday"</b>: [
-					"Entreé 1",
-					"Entreé 2",
-					...
-				],
-				<b>"friday"</b>: [
-					"Entreé 1",
-					"Entreé 2",
-					...
-				],
-				<b>"saturday"</b>: [
-					"Entreé 1",
-					"Entreé 2",
-					...
-				],
-				<b>"sunday"</b>: [
-					"Entreé 1",
-					"Entreé 2",
-					...
-				],
-			},
-			<b>"dinner"</b>: Same format as <b>"lunch"</b>
-		}
-	},
-	"Servery Name 2": Same format as "Servery Name 1",
-	...
-}
-</pre>
 		</li>
+
+		<br>
+
+		<li id="todaymenuapi">
+			<a class="getrequest" href="/Today" target="_blank">&#47;Today</a>: Returns a JSON object (<span class="boldtext">application/json</span>) of the menu for all serveries for the day that the GET request is sent (Monday, Tuesday, etc.). The format of this JSON object is as follows:
+
+			<br>
+		</li>
+
+		<br>
+
+		<li>
+			<a class="getrequest" href="/Monday" target="_blank">&#47;Monday</a>, <a class="getrequest" href="/Tuesday" target="_blank">&#47;Tuesday</a>, <a class="getrequest" href="/Wednesday" target="_blank">&#47;Wednesday</a>, <a class="getrequest" href="/Thursday" target="_blank">&#47;Thursday</a>, <a class="getrequest" href="/Friday" target="_blank">&#47;Friday</a>, <a class="getrequest" href="/Saturday" target="_blank">&#47;Saturday</a>, <a class="getrequest" href="/Sunday" target="_blank">&#47;Sunday</a>: Returns a JSON object (<span class="boldtext">application/json</span>) of the menu for all serveries for the specified day. The format of this JSON object is exactly the same as <a class="getrequest" href="/Today" target="_blank">&#47;Today</a>.
+		</li>
+
+		<br>
+
+		<li id="locationmenuapi">
+			<a class="getrequest" href="/Baker" target="_blank">&#47;Baker</a>, <a class="getrequest" href="/North" target="_blank">&#47;North</a>, <a class="getrequest" href="/Seibel" target="_blank">&#47;Seibel</a>, <a class="getrequest" href="/SidRich" target="_blank">&#47;SidRich</a>, <a class="getrequest" href="/South" target="_blank">&#47;South</a>, <a class="getrequest" href="/West" target="_blank">&#47;West</a>: Returns a JSON object (<span class="boldtext">application/json</span>) of the menu schedule for lunch and dinner for the specified location. The format of this JSON object is as follows:
+
+			<br>
+		</li>
+
+		<br>
 
 		<li>Other APIs are currently in the works so stay tuned.</li>
 	</ul>
 
 	<br>
 
-	<p>If you can see this page, it means that the server is up and running as expected. However, if something is not behaving as it should be, send a message to <a href="mailto:as100@rice.edu">as100@rice.edu</a> or <a href="mailto:jcd7@rice.edu">jcd7@rice.edu</a> to fix it as soon as possible.</p>
+	<p>If you can see this page, it means that the server is up and running as expected. However, if something is not behaving as it should be, send a message to either Andres Salgado (<a href="mailto:as100@rice.edu">as100@rice.edu</a>) or Jade Dever Matthews (<a href="mailto:jcd7@rice.edu">jcd7@rice.edu</a>) to fix it as soon as possible.</p>
 </body>
 
 </html>
