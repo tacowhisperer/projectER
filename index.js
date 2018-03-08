@@ -22,19 +22,74 @@ const DINNER = 2;
 const SAME_LINE_THRESH = 0.8
 const DINING_UPDATE_INTERVAL_MS = 1000 /*ms*/ * 60 /*secs*/ * 60 /*mins*/;
 
+// Maps days of the week to indices used by Date.prototype.getDay()
+const daysOfTheWeek = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
+
 // Holds the response page for the / GET request
 const welcomeHTML = fs.readFileSync('resources/index.html', 'utf8');
 
 // Holds the server that listens to new requests
 let server = null;
 
+/**
+ * The following are the containers for the different GET requests.
+ */
+
 // Holds the different, final PDF JSON objects that will be deployed to the API users
 let serveryJsonObjects;
+
+// Holds the string that represents today
+let today;
 
 // Holds the response to the /WeeklyMenu GET request
 let weeklyMenu;
 
-// Starts the menu processing callback chain.
+// Holds the response to the /Today GET request
+let todayMenu;
+
+// Holds the response to the /Monday GET request
+let mondayMenu;
+
+// Holds the response to the /Tuesday GET request
+let tuesdayMenu;
+
+// Holds the response to the /Wednesday GET request
+let wednesdayMenu;
+
+// Holds the response to the /Thursday GET request
+let thursdayMenu;
+
+// Holds the response to the /Friday GET request
+let fridayMenu;
+
+// Holds the response to the /Saturday GET request
+let saturdayMenu;
+
+// Holds the response to the /Sunday GET request
+let sundayMenu;
+
+// Holds the response to the /Baker GET request
+let bakerMenu;
+
+// Holds the response to the /North GET request
+let northMenu;
+
+// Holds the response to the /Seibel GET request
+let seibelMenu;
+
+// Holds the response to the /SidRich GET request
+let sidRichMenu;
+
+// Holds the response to the /South GET request
+let southMenu;
+
+// Holds the response to the /West GET request
+let westMenu;
+
+
+/**
+ * Starts the menu processing callback chain.
+ */
 start();
 
 // Sets the chain to restart every hour.
@@ -45,6 +100,26 @@ function start() {
 	finish(() => {
 		// Generate the weekly menu JSON object from the serveryJsonObjects array
 		weeklyMenu = generateWeeklyMenu(serveryJsonObjects);
+
+		// Get the string of today's day of the week
+		today = daysOfTheWeek[new Date().getDay()];
+
+		// Generate the appropriate JSON object for each GET request container
+		todayMenu = generateDayMenu(today, weeklyMenu);
+		mondayMenu = generateDayMenu("monday", weeklyMenu);
+		tuesdayMenu = generateDayMenu("tuesday", weeklyMenu);
+		wednesdayMenu = generateDayMenu("wednesday", weeklyMenu);
+		thursdayMenu = generateDayMenu("thursday", weeklyMenu);
+		fridayMenu = generateDayMenu("friday", weeklyMenu);
+		saturdayMenu = generateDayMenu("saturday", weeklyMenu);
+		sundayMenu = generateDayMenu("sunday", weeklyMenu);
+
+		bakerMenu = generateServeryMenu("Baker", weeklyMenu);
+		northMenu = generateServeryMenu("North", weeklyMenu);
+		seibelMenu = generateServeryMenu("Seibel", weeklyMenu);
+		sidRichMenu = generateServeryMenu("Sid Rich", weeklyMenu);
+		southMenu = generateServeryMenu("South", weeklyMenu);
+		westMenu = generateServeryMenu("West", weeklyMenu);
 
 		// Close any previously running express servers
 		if (server != null)
@@ -66,6 +141,76 @@ function start() {
 			response.type('html');
 			response.send("finished");
 		})
+
+		app.get('/Today', (request, response) => {
+			response.type('json');
+			response.send(todayMenu);
+		});
+
+		app.get('/Monday', (request, response) => {
+			response.type('json');
+			response.send(mondayMenu);
+		});
+
+		app.get('/Tuesday', (request, response) => {
+			response.type('json');
+			response.send(tuesdayMenu);
+		});
+
+		app.get('/Wednesday', (request, response) => {
+			response.type('json');
+			response.send(wednesdayMenu);
+		});
+
+		app.get('/Thursday', (request, response) => {
+			response.type('json');
+			response.send(thursdayMenu);
+		});
+
+		app.get('/Friday', (request, response) => {
+			response.type('json');
+			response.send(fridayMenu);
+		});
+
+		app.get('/Saturday', (request, response) => {
+			response.type('json');
+			response.send(saturdayMenu);
+		});
+
+		app.get('/Sunday', (request, response) => {
+			response.type('json');
+			response.send(sundayMenu);
+		});
+
+		app.get('/Baker', (request, response) => {
+			response.type('json');
+			response.send(bakerMenu);
+		});
+
+		app.get('/North', (request, response) => {
+			response.type('json');
+			response.send(northMenu);
+		});
+
+		app.get('/Seibel', (request, response) => {
+			response.type('json');
+			response.send(seibelMenu);
+		});
+
+		app.get('/SidRich', (request, response) => {
+			response.type('json');
+			response.send(sidRichMenu);
+		});
+
+		app.get('/South', (request, response) => {
+			response.type('json');
+			response.send(southMenu);
+		});
+
+		app.get('/West', (request, response) => {
+			response.type('json');
+			response.send(westMenu);
+		});
 
 		app.get('/WeeklyMenu', (request, response) => {
 			response.type('json');
@@ -348,7 +493,6 @@ function condenseAndOrderGroupsArraysTextElements(groupArray) {
 }
 
 function reformatPageArrayToAppropraiteTitles(pageArray) {
-
     let menu = {
         lunch: pageArray[LUNCH], //the first page
         dinner: pageArray[DINNER] //the second page
@@ -458,6 +602,26 @@ function generateWeeklyMenu(serveryJsonObjectsArray) {
 	}
 
 	return weeklyMenuTemp;
+}
+
+function generateDayMenu(dayOfTheWeek, weeklyMenuJson) {
+	let dayOfTheWeekMenu = {};
+
+	for (let servery in weeklyMenuJson) {
+		dayOfTheWeekMenu[servery] = {
+			chef: weeklyMenuJson[servery].chef,
+			menu: {
+				lunch: weeklyMenuJson[servery].menu.lunch[dayOfTheWeek],
+				dinner: weeklyMenuJson[servery].menu.dinner[dayOfTheWeek]
+			}
+		};
+	}
+
+	return dayOfTheWeekMenu;
+}
+
+function generateServeryMenu(servery, weeklyMenuJson) {
+	return weeklyMenuJson[servery];
 }
 
 function finish(callback) {
