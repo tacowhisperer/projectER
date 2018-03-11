@@ -33,9 +33,11 @@ body {
 h1 {
 	background-color: #16355b;
 	color: #eee;
+	font-size: 2em;
 	line-height: 4em;
 	margin: 0;
 	text-align: center;
+	white-space: nowrap;
 }
 
 h2 {
