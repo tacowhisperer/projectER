@@ -25,8 +25,12 @@
 
 		let apiSamples = [];
 		let apiSampleIdx = 0;
+		let firstResize = true;
 
 		window.onload = () => {
+			// Save the initial window width value
+			let prevWindowWidth = window.innerWidth;
+
 			// Get the bodydiv element
 			const bodyDiv = document.getElementById("bodydiv");
 
@@ -62,8 +66,16 @@
 
 				// Handle the awkward widths of the JSON text boxes
 				window.onresize = () => {
+					// If the new window height change is significant, update the window height value used for calculating the body width
+					let resizeBodyDiv = firstResize || prevWindowWidth != window.innerWidth;
+
 					// Make sure that the main text of the body looks good
-					bodyDiv.style.width = ((WINDOW_WIDTH_RATIO + (window.innerWidth > window.innerHeight ? 0 : (1 - window.innerWidth / window.innerHeight) * (1 - WINDOW_WIDTH_RATIO))) * window.innerWidth) + "px";
+					if (resizeBodyDiv) {
+						bodyDiv.style.width = ((WINDOW_WIDTH_RATIO + (window.innerWidth > window.innerHeight ? 0 : (1 - window.innerWidth / window.innerHeight) * (1 - WINDOW_WIDTH_RATIO))) * window.innerWidth) + "px";
+
+						firstResize = false;
+						prevWindowWidth = window.innerWidth;
+					}
 
 					// Resize the API example text boxes
 					for (let i = 0; i < examples.length; i++) {
