@@ -20,8 +20,11 @@
 
 	<!-- Fixes the awkward sizes of the JSON sample blocks. -->
 	<script>
+		// Get the document element
+		const docElem = document.documentElement;
+
 		const IDEAL_WIDTH = 650;
-		const WINDOW_WIDTH_RATIO = 0.65;
+		const WINDOW_WIDTH_RATIO = 0.55;
 
 		let apiSamples = [];
 		let apiSampleIdx = 0;
@@ -29,7 +32,7 @@
 
 		window.onload = () => {
 			// Save the initial window width value
-			let prevWindowWidth = window.innerWidth;
+			let prevWindowWidth = docElem.clientWidth;
 
 			// Get the bodydiv element
 			const bodyDiv = document.getElementById("bodydiv");
@@ -44,37 +47,41 @@
 			loadJsonExampleText("resources/locationmenu.html", document.getElementById("locationmenuapi"));
 		
 			// Add the date since the last time the server updated
-			let updateRequest = createAjaxCall("/LastUpdate", lastUpdateHTML => {
+			let lastUpdateRequest = createAjaxCall("/LastUpdate", lastUpdateText => {
 				// Create the new element to be appended to the target element
 				let newElement = document.createElement("p");
 
-				// Set the element's attributes
-				newElement.innerHTML = lastUpdateHTML;
+				// Set the ID tag so that the CSS may style it.
+				newElement.id = "lastupdateapi";
 
-				// The target element in this case is the bodyDiv
+				// Create the node that holds the text
+				let newElementText = document.createTextNode(lastUpdateText);
+
+				newElement.appendChild(newElementText);
+
+				// The target element in this case is the bodyDiv element
 				let targetElement = document.getElementById("bodydiv");
 
 				// Append it to the end of the target element.
-				while (newElement.firstChild)
-					targetElement.appendChild(newElement.firstChild);
+				targetElement.appendChild(newElement);
 			}, status => console.error("Request for '/LastUpdate' failed with status " + status));
-			updateRequest.send();
+			lastUpdateRequest.send();
 
 			// Wait until all async JSON example requests have completed to commence resizing handlers
 			finish(() => {
 				let examples = document.getElementsByClassName("jsontextbox");
 
-				// Handle the awkward widths of the JSON text boxes
+				// Handle the elements that require dynamic resizing.
 				window.onresize = () => {
 					// If the new window height change is significant, update the window height value used for calculating the body width
-					let resizeBodyDiv = firstResize || prevWindowWidth != window.innerWidth;
+					let resizeBodyDiv = firstResize || prevWindowWidth != docElem.clientWidth;
 
 					// Make sure that the main text of the body looks good
 					if (resizeBodyDiv) {
-						bodyDiv.style.width = ((WINDOW_WIDTH_RATIO + (window.innerWidth > window.innerHeight ? 0 : (1 - window.innerWidth / window.innerHeight) * (1 - WINDOW_WIDTH_RATIO))) * window.innerWidth) + "px";
+						bodyDiv.style.width = ((WINDOW_WIDTH_RATIO + (docElem.clientWidth > window.innerHeight ? 0 : (1 - docElem.clientWidth / window.innerHeight) * (1 - WINDOW_WIDTH_RATIO))) * docElem.clientWidth) + "px";
 
 						firstResize = false;
-						prevWindowWidth = window.innerWidth;
+						prevWindowWidth = docElem.clientWidth;
 					}
 
 					// Resize the API example text boxes
@@ -82,7 +89,7 @@
 						let apiSample = examples[i];
 						let apiSampleRect = apiSample.getBoundingClientRect();
 
-						apiSample.style.width = window.innerWidth - 2 * apiSampleRect.x + "px";
+						apiSample.style.width = docElem.clientWidth - 2 * apiSampleRect.x + "px";
 					}
 				};
 
@@ -153,14 +160,21 @@
 <body>
 	<h1>Welcome to Project-ER!</h1>
 	<div id="bodydiv">
-		<p>Project-ER (Project Eat Rice) is a work-in-progress server that takes the weekly servery menus found <a class="referencelink boldtext" href="http://dining.rice.edu/undergraduate-dining/college-serveries/weekly-menus/" target="_blank">here</a>, and then converts them from PDF format into an easy-to-process JSON format.</p>
-		<p>The server is written in JavaScript using <a class="referencelink boldtext" href="https://nodejs.org/en/" target="_blank">Node.js</a> + <a class="referencelink boldtext" href="https://expressjs.com/" target="_blank">Express</a> + <a class="referencelink boldtext" href="https://www.npmjs.com/package/download" target="_blank">download-file</a> + <a class="referencelink boldtext" href="https://www.npmjs.com/package/pdf2json" target="_blank">pdf2json</a>. The source code for the service can be found <a class="referencelink boldtext" href="https://github.com/tacowhisperer/projectER" target="_blank">here</a>.</p>
+		<h2 id="about">About Project-ER</h2>
+		<hr>
+		<p>Project-ER, namely Project Eat Rice, is written in JavaScript using <a class="referencelink boldtext" href="https://nodejs.org/en/" target="_blank">Node.js</a> + <a class="referencelink boldtext" href="https://expressjs.com/" target="_blank">Express</a> + <a class="referencelink boldtext" href="https://www.npmjs.com/package/download" target="_blank">download-file</a> + <a class="referencelink boldtext" href="https://www.npmjs.com/package/pdf2json" target="_blank">pdf2json</a>. </p>
+
+		<p>It began as a proof-of-concept during HackRice 7.5 in 2018. Even though the idea of providing a way to get menu information at Rice is not original, the devs noted that nobody had provided an easy way to access the weekly menu information from the Rice Dining website. This project aim to tackle this. It takes the weekly servery menus found <a class="referencelink boldtext" href="http://dining.rice.edu/undergraduate-dining/college-serveries/weekly-menus/" target="_blank">here</a>, and then converts them from PDF format into an easy-to-process JSON format. Though this solution is far from perfect, it shows that the menu information can be obtained and organized from the PDF file format.</p>
+
+		<p>To get started, simply create your own application that can make GET requests over the internet to <span class="referencelink boldtext" id="thisurl"></span> (this page). Then simply specify which API you want to use and the appropriate response data will be sent. The APIs are outlined in greater detail below. More APIs are planned to be implemented in the near future, so stay tuned for those.</p>
+
+		<p>Source code for Project-ER can be found <a class="referencelink boldtext" href="https://github.com/tacowhisperer/projectER" target="_blank">here</a>.</p>
 
 		<br>
 
-		<h2>API Usage</h2>
+		<h2 id="apiusage">API Usage</h2>
 		<hr>
-		<p>The list below shows the different GET requests and outputs of those requests. Note that keys in the sample JSON objects shown mean that they can be any valid JSON string (bold keys should be interpreted literally).</p>
+		<p>The list below shows the different GET requests and outputs of those requests. Note that any text that is in bold in the examples should be interpreted literally.</p>
 		<ul>
 			<li id="weeklymenuapi">
 				<a class="getrequest" href="/WeeklyMenu" target="_blank">&#47;WeeklyMenu</a>: Returns a JSON object (<span class="boldtext">application/json</span>) of the weekly menu for all serveries that have a weekly menu PDF <a href="http://dining.rice.edu/undergraduate-dining/college-serveries/weekly-menus/" target="_blank">here</a>. The format of this JSON object is as follows:
@@ -194,38 +208,31 @@
 			<br>
 
 			<li>
-				<a class="getrequest" href="/LastUpdate" target="_blank">&#47;LastUpdate</a>: Returns HTML (<span class="boldtext">text/html</span>) of the last time the server obtained information from the Rice Dining page. The returned HTML is formatted as follows:
+				<a class="getrequest" href="/LastUpdate" target="_blank">&#47;LastUpdate</a>: Returns text (<span class="boldtext">text/plain</span>) of the last time the server obtained information from the Rice Dining page. Note that this time is local to the server and not the calling machine. The returned HTML is formatted as follows:
 
 				<br>
-<pre class="jsontextbox" id="lastupdateexample">
-<b>&lt;p&gt;Last Menu Update: </b>YYYY<b>-</b>M?M<b>-</b>D?D HH<b>:</b>MM<b>:</b>SS<b>&lt;/p&gt;</b>
-</pre>
+
+				<pre class="jsontextbox" id="lastupdateexample"><b>Last Menu Update: </b>YYYY<b>-</b>M?M<b>-</b>D?D HH<b>:</b>MM<b>:</b>SS <b>GMT</b>[+-]\d+ <b>(</b>Timezone String<b>)</b></pre>
 			</li>
 		</ul>
 
 		<br>
 
-		<h2>The Developer Team</h2>
+		<h2 id="thedevteam">The Developer Team</h2>
 		<hr>
-		<p>The development of this solution was spearheaded by Jade Dever Matthews (#insert personal page here) and Andres Salgado (#insert personal page here). (#insert more details if want to here)</p>
+		<p>Project-ER was spearheaded by Rice University undergraduate students <a class="referencelink" href="#thedevteam">Jade Dever Matthews</a> and <a class="referencelink" href="https://github.com/tacowhisperer" target="_blank">Andres Salgado</a>. Both developers are aspiring CS majors, and enjoy a good game of Smash Brothers after class.</p>
 
 		<br>
 
-		<h2>About Project-ER</h2>
-		<hr>
-		<p>Project-ER, namely Project Eat Rice, bega during HackRice 7.5 in 2018. Though the idea of providing a way to get menu information at Rice is not original, the devs noted that nobody had provided an easy way to access the weekly menu information from the Rice Dining website. More APIs are planned to be implemented in the near future, so stay tuned for those.</p>
-
-		<br>
-
-		<h2>Troubleshooting</h2>
+		<h2 id="troubleshooting">Troubleshooting</h2>
 		<hr>
 		<p>If you can see this page, it means that the server is up and running as expected. However, if something is not behaving as it should be, send a message to either Andres (<a href="mailto:as100@rice.edu">as100@rice.edu</a>) or Jade (<a href="mailto:jcd7@rice.edu">jcd7@rice.edu</a>) to fix it as soon as possible.</p>
 
 		<br>
 
-		<h2>Licensing</h2>
+		<h2 id="licensing">Licensing and Terms of Usage</h2>
 		<hr>
-		<p>Tbd, but we ask that credit is given where credit is due.</p>
+		<p>The exact licencing policy is still to be determined. In the meantime, any and all aspects of Project-ER are free to use as seen fit. All we ask is that credit be given where credit is due.</p>
 	</div>
 </body>
 
