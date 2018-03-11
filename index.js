@@ -145,7 +145,7 @@ function start() {
 		});
 
 		app.get(/LastUpdate/i, (request, response) => {
-			response.type('html');
+			response.type('txt');
 			response.send(lastMenuUpdateHTML);
 		});
 
@@ -668,9 +668,12 @@ function generateServeryMenu(servery, weeklyMenuJson) {
 
 function generateLastMenuUpdateHTML() {
 	let currentDate = new Date();
-	let timeStr = "Last Menu Update: " + currentDate.toLocaleString();
+	let timeZoneMatch = currentDate.toString().match(/([A-Z]+[\+-][0-9]+.*$)/);
+	let timeZone = timeZoneMatch.length >= 2 ? ' ' + timeZoneMatch[1] : '';
 
-	return "<p id=\"lastupdateapi\">" + timeStr + "</p>";
+	let timeStr = "Last Menu Update: " + currentDate.toLocaleString() + timeZone;
+
+	return timeStr;
 }
 
 function finish(callback) {
