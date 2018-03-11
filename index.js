@@ -44,6 +44,9 @@ let server = null;
 // Holds the different, final PDF JSON objects that will be deployed to the API users
 let serveryJsonObjects;
 
+// Holds the HTML of the date of the last menu update
+let lastMenuUpdateHTML;
+
 // Holds the string that represents today
 let today;
 
@@ -104,6 +107,9 @@ setInterval(start, DINING_UPDATE_INTERVAL_MS);
 function start() {
 	// Waits for all dining location PDF files to be converted to usable JSON objects to start listening for requests.
 	finish(() => {
+		// Store the time and date that this new update completed
+		lastMenuUpdateHTML = generateLastMenuUpdateHTML();
+
 		// Generate the weekly menu JSON object from the serveryJsonObjects array
 		weeklyMenu = generateWeeklyMenu(serveryJsonObjects);
 
@@ -136,6 +142,11 @@ function start() {
 		app.get('/', (request, response) => {
 			response.type('html');
 			response.send(welcomeHTML);
+		});
+
+		app.get(/LastUpdate/i, (request, response) => {
+			response.type('html');
+			response.send(lastMenuUpdateHTML);
 		});
 
 		app.get(/(resources)?\/?index\.css/i, (request, response) => {
@@ -653,6 +664,13 @@ function generateDayMenu(dayOfTheWeek, weeklyMenuJson) {
 
 function generateServeryMenu(servery, weeklyMenuJson) {
 	return weeklyMenuJson[servery];
+}
+
+function generateLastMenuUpdateHTML() {
+	let currentDate = new Date();
+	let timeStr = "Last Menu Update: " + currentDate.toLocaleString();
+
+	return "<p id=\"lastupdateapi\">" + timeStr + "</p>";
 }
 
 function finish(callback) {

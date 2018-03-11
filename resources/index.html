@@ -21,29 +21,56 @@
 	<!-- Fixes the awkward sizes of the JSON sample blocks. -->
 	<script>
 		const IDEAL_WIDTH = 650;
+		const WINDOW_WIDTH_RATIO = 0.65;
 
 		let apiSamples = [];
 		let apiSampleIdx = 0;
 
 		window.onload = () => {
+			// Get the bodydiv element
+			const bodyDiv = document.getElementById("bodydiv");
+
 			// Attach the example JSON to the /WeeklyMenu list entry
-			loadHtmlFile("resources/weeklymenu.html", document.getElementById("weeklymenuapi"));
+			loadJsonExampleText("resources/weeklymenu.html", document.getElementById("weeklymenuapi"));
 
 			// Attach the example JSON to the /Today list entry
-			loadHtmlFile("resources/todaymenu.html", document.getElementById("todaymenuapi"));
+			loadJsonExampleText("resources/todaymenu.html", document.getElementById("todaymenuapi"));
 
 			// Attach the example JSON to the /Baker, /North, /Seibel, /SidRich/ South, and /West list entry
-			loadHtmlFile("resources/locationmenu.html", document.getElementById("locationmenuapi"));
+			loadJsonExampleText("resources/locationmenu.html", document.getElementById("locationmenuapi"));
 		
-			// Wait until all async requests have completed to commence resizing handlers
+			// Add the date since the last time the server updated
+			let updateRequest = createAjaxCall("/LastUpdate", lastUpdateHTML => {
+				// Create the new element to be appended to the target element
+				let newElement = document.createElement("p");
+
+				// Set the element's attributes
+				newElement.innerHTML = lastUpdateHTML;
+
+				// The target element in this case is the bodyDiv
+				let targetElement = document.getElementById("bodydiv");
+
+				// Append it to the end of the target element.
+				while (newElement.firstChild)
+					targetElement.appendChild(newElement.firstChild);
+			}, status => console.error("Request for '/LastUpdate' failed with status " + status));
+			updateRequest.send();
+
+			// Wait until all async JSON example requests have completed to commence resizing handlers
 			finish(() => {
+				let examples = document.getElementsByClassName("jsontextbox");
+
 				// Handle the awkward widths of the JSON text boxes
 				window.onresize = () => {
-					for (let i = 0; i < apiSamples.length; i++) {
-						let apiSample = apiSamples[i];
+					// Make sure that the main text of the body looks good
+					bodyDiv.style.width = ((WINDOW_WIDTH_RATIO + (window.innerWidth > window.innerHeight ? 0 : (1 - window.innerWidth / window.innerHeight) * (1 - WINDOW_WIDTH_RATIO))) * window.innerWidth) + "px";
+
+					// Resize the API example text boxes
+					for (let i = 0; i < examples.length; i++) {
+						let apiSample = examples[i];
 						let apiSampleRect = apiSample.getBoundingClientRect();
 
-						apiSample.style.width = Math.min(window.innerWidth - 2 * apiSampleRect.x, IDEAL_WIDTH) + "px";
+						apiSample.style.width = window.innerWidth - 2 * apiSampleRect.x + "px";
 					}
 				};
 
@@ -52,34 +79,46 @@
 			});
 		};
 
-		function loadHtmlFile(htmlPath, targetElement) {
-			let xhttp = new XMLHttpRequest();
+		function loadJsonExampleText(htmlPath, tE) {
+			// Get the location that this example is registered on in the apiSamples array.
 			const targetIdx = apiSampleIdx++;
+			const targetElement = tE;
 
 			// Register the new entry in the apiSamples array.
 			apiSamples[targetIdx] = null;
 
-			// Delaying sending the request allows the finish function a chance to detect that a new entry has been added
-			setTimeout(() => {
-				xhttp.onreadystatechange = function() {
-					if (this.readyState == 4 && this.status == 200) {
-						// Create the new element to be appended to the target element
-						let newElement = document.createElement("p");
+			let xhttp = createAjaxCall(htmlPath, responseText => {
+				// Create the new element to be appended to the target element
+				let newElement = document.createElement("p");
 
-						// Set the element's attributes
-						newElement.innerHTML = this.responseText;
+				// Set the element's attributes
+				newElement.innerHTML = responseText;
 
-						// Append it to the end of the target element.
-						while (newElement.firstChild)
-							targetElement.appendChild(newElement.firstChild);
+				// Append it to the end of the target element.
+				while (newElement.firstChild)
+					targetElement.appendChild(newElement.firstChild);
 
-						apiSamples[targetIdx] = targetElement.lastChild;
-					}
-				};
+				apiSamples[targetIdx] = targetElement.lastChild;
+			}, status => console.error("Request for '" + htmlPath + "' failed with status " + status));
 
-				xhttp.open("GET", htmlPath, true);
-				xhttp.send();
-			}, 5);
+			// Delaying sending the request allows the finish function a chance to detect that a new entry has been added.
+			setTimeout(() => xhttp.send(), 5);
+		}
+
+		function createAjaxCall(requestPath, successCallback, failCallback) {
+			let xhttp = new XMLHttpRequest();
+
+			xhttp.onreadystatechange = function () {
+				if (this.readyState == 4 && this.status == 200)
+					successCallback(this.responseText);
+
+				else if (this.readyState == 4)
+					failCallback(this.status);
+			};
+
+			xhttp.open("GET", requestPath, true);
+
+			return xhttp;
 		}
 
 		function finish(callback) {
@@ -100,52 +139,82 @@
 </head>
 
 <body>
-	<h1>Welcome to Project-ER!</h1>
-	<p>Project-ER (Project Eat Rice) is a work-in-progress server that takes the weekly servery menus found <a class="referencelink boldtext" href="http://dining.rice.edu/undergraduate-dining/college-serveries/weekly-menus/" target="_blank">here</a>, and then converts them from PDF format into an easy-to-process JSON format.</p>
-	<p>The server is written in JavaScript using <a class="referencelink boldtext" href="https://nodejs.org/en/" target="_blank">Node.js</a> + <a class="referencelink boldtext" href="https://expressjs.com/" target="_blank">Express</a> + <a class="referencelink boldtext" href="https://www.npmjs.com/package/download" target="_blank">download-file</a> + <a class="referencelink boldtext" href="https://www.npmjs.com/package/pdf2json" target="_blank">pdf2json</a>. The source code for the service can be found <a class="referencelink boldtext" href="https://github.com/tacowhisperer/projectER" target="_blank">here</a>.</p>
+	<div id="bodydiv">
+		<h1>Welcome to Project-ER!</h1>
+		<p>Project-ER (Project Eat Rice) is a work-in-progress server that takes the weekly servery menus found <a class="referencelink boldtext" href="http://dining.rice.edu/undergraduate-dining/college-serveries/weekly-menus/" target="_blank">here</a>, and then converts them from PDF format into an easy-to-process JSON format.</p>
+		<p>The server is written in JavaScript using <a class="referencelink boldtext" href="https://nodejs.org/en/" target="_blank">Node.js</a> + <a class="referencelink boldtext" href="https://expressjs.com/" target="_blank">Express</a> + <a class="referencelink boldtext" href="https://www.npmjs.com/package/download" target="_blank">download-file</a> + <a class="referencelink boldtext" href="https://www.npmjs.com/package/pdf2json" target="_blank">pdf2json</a>. The source code for the service can be found <a class="referencelink boldtext" href="https://github.com/tacowhisperer/projectER" target="_blank">here</a>.</p>
 
-	<br>
+		<br>
 
-	<h3>API Usage</h3>
-	<p>The list below shows the different GET requests and outputs of those requests. Note that keys in the sample JSON objects shown mean that they can be any valid JSON string (bold keys should be interpreted literally).</p>
-	<ul>
-		<li id="weeklymenuapi">
-			<a class="getrequest" href="/WeeklyMenu" target="_blank">&#47;WeeklyMenu</a>: Returns a JSON object (<span class="boldtext">application/json</span>) of the weekly menu for all serveries that have a weekly menu PDF <a href="http://dining.rice.edu/undergraduate-dining/college-serveries/weekly-menus/" target="_blank">here</a>. The format of this JSON object is as follows:
+		<h2>API Usage</h2>
+		<hr>
+		<p>The list below shows the different GET requests and outputs of those requests. Note that keys in the sample JSON objects shown mean that they can be any valid JSON string (bold keys should be interpreted literally).</p>
+		<ul>
+			<li id="weeklymenuapi">
+				<a class="getrequest" href="/WeeklyMenu" target="_blank">&#47;WeeklyMenu</a>: Returns a JSON object (<span class="boldtext">application/json</span>) of the weekly menu for all serveries that have a weekly menu PDF <a href="http://dining.rice.edu/undergraduate-dining/college-serveries/weekly-menus/" target="_blank">here</a>. The format of this JSON object is as follows:
+
+				<br>
+			</li>
 
 			<br>
-		</li>
 
-		<br>
+			<li id="todaymenuapi">
+				<a class="getrequest" href="/Today" target="_blank">&#47;Today</a>: Returns a JSON object (<span class="boldtext">application/json</span>) of the menu for all serveries for the day that the GET request is sent (Monday, Tuesday, etc.). The format of this JSON object is as follows:
 
-		<li id="todaymenuapi">
-			<a class="getrequest" href="/Today" target="_blank">&#47;Today</a>: Returns a JSON object (<span class="boldtext">application/json</span>) of the menu for all serveries for the day that the GET request is sent (Monday, Tuesday, etc.). The format of this JSON object is as follows:
-
-			<br>
-		</li>
-
-		<br>
-
-		<li>
-			<a class="getrequest" href="/Monday" target="_blank">&#47;Monday</a>, <a class="getrequest" href="/Tuesday" target="_blank">&#47;Tuesday</a>, <a class="getrequest" href="/Wednesday" target="_blank">&#47;Wednesday</a>, <a class="getrequest" href="/Thursday" target="_blank">&#47;Thursday</a>, <a class="getrequest" href="/Friday" target="_blank">&#47;Friday</a>, <a class="getrequest" href="/Saturday" target="_blank">&#47;Saturday</a>, <a class="getrequest" href="/Sunday" target="_blank">&#47;Sunday</a>: Returns a JSON object (<span class="boldtext">application/json</span>) of the menu for all serveries for the specified day. The format of this JSON object is exactly the same as <a class="getrequest" href="/Today" target="_blank">&#47;Today</a>.
-		</li>
-
-		<br>
-		<br>
-
-		<li id="locationmenuapi">
-			<a class="getrequest" href="/Baker" target="_blank">&#47;Baker</a>, <a class="getrequest" href="/North" target="_blank">&#47;North</a>, <a class="getrequest" href="/Seibel" target="_blank">&#47;Seibel</a>, <a class="getrequest" href="/SidRich" target="_blank">&#47;SidRich</a>, <a class="getrequest" href="/South" target="_blank">&#47;South</a>, <a class="getrequest" href="/West" target="_blank">&#47;West</a>: Returns a JSON object (<span class="boldtext">application/json</span>) of the menu schedule for lunch and dinner for the specified location. The format of this JSON object is as follows:
+				<br>
+			</li>
 
 			<br>
-		</li>
+
+			<li>
+				<a class="getrequest" href="/Monday" target="_blank">&#47;Monday</a>, <a class="getrequest" href="/Tuesday" target="_blank">&#47;Tuesday</a>, <a class="getrequest" href="/Wednesday" target="_blank">&#47;Wednesday</a>, <a class="getrequest" href="/Thursday" target="_blank">&#47;Thursday</a>, <a class="getrequest" href="/Friday" target="_blank">&#47;Friday</a>, <a class="getrequest" href="/Saturday" target="_blank">&#47;Saturday</a>, <a class="getrequest" href="/Sunday" target="_blank">&#47;Sunday</a>: Returns a JSON object (<span class="boldtext">application/json</span>) of the menu for all serveries for the specified day. The format of this JSON object is exactly the same as <a class="getrequest" href="/Today" target="_blank">&#47;Today</a>.
+			</li>
+
+			<br>
+			<br>
+
+			<li id="locationmenuapi">
+				<a class="getrequest" href="/Baker" target="_blank">&#47;Baker</a>, <a class="getrequest" href="/North" target="_blank">&#47;North</a>, <a class="getrequest" href="/Seibel" target="_blank">&#47;Seibel</a>, <a class="getrequest" href="/SidRich" target="_blank">&#47;SidRich</a>, <a class="getrequest" href="/South" target="_blank">&#47;South</a>, <a class="getrequest" href="/West" target="_blank">&#47;West</a>: Returns a JSON object (<span class="boldtext">application/json</span>) of the menu schedule for lunch and dinner for the specified location. The format of this JSON object is as follows:
+
+				<br>
+			</li>
+
+			<br>
+
+			<li>
+				<a class="getrequest" href="/LastUpdate" target="_blank">&#47;LastUpdate</a>: Returns HTML (<span class="boldtext">text/html</span>) of the last time the server obtained information from the Rice Dining page. The returned HTML is formatted as follows:
+
+				<br>
+<pre class="jsontextbox" id="lastupdateexample">
+<b>&lt;p&gt;Last Menu Update: </b>YYYY<b>-</b>M?M<b>-</b>D?D HH<b>:</b>MM<b>:</b>SS<b>&lt;/p&gt;</b>
+</pre>
+			</li>
+		</ul>
 
 		<br>
 
-		<li>Other APIs are currently in the works so stay tuned.</li>
-	</ul>
+		<h2>The Developer Team</h2>
+		<hr>
+		<p>The development of this solution was spearheaded by Jade Dever Matthews (#insert personal page here) and Andres Salgado (#insert personal page here). (#insert more details if want to here)</p>
 
-	<br>
+		<br>
 
-	<p>If you can see this page, it means that the server is up and running as expected. However, if something is not behaving as it should be, send a message to either Andres Salgado (<a href="mailto:as100@rice.edu">as100@rice.edu</a>) or Jade Dever Matthews (<a href="mailto:jcd7@rice.edu">jcd7@rice.edu</a>) to fix it as soon as possible.</p>
+		<h2>About Project-ER</h2>
+		<hr>
+		<p>Project-ER, namely Project Eat Rice, bega during HackRice 7.5 in 2018. Though the idea of providing a way to get menu information at Rice is not original, the devs noted that nobody had provided an easy way to access the weekly menu information from the Rice Dining website. More APIs are planned to be implemented in the near future, so stay tuned for those.</p>
+
+		<br>
+
+		<h2>Troubleshooting</h2>
+		<hr>
+		<p>If you can see this page, it means that the server is up and running as expected. However, if something is not behaving as it should be, send a message to either Andres (<a href="mailto:as100@rice.edu">as100@rice.edu</a>) or Jade (<a href="mailto:jcd7@rice.edu">jcd7@rice.edu</a>) to fix it as soon as possible.</p>
+
+		<br>
+
+		<h2>Licensing</h2>
+		<hr>
+		<p>Tbd, but we ask that credit is given where credit is due.</p>
+	</div>
 </body>
 
 </html>

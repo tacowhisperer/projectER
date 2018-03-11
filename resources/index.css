@@ -1,7 +1,13 @@
 body {
 	font-family: 'Ubuntu Mono', Consolas, monospace;
 	margin: 0;
-	padding: 1em;
+}
+
+#bodydiv{
+	margin-left: auto;
+	margin-right: auto;
+	padding: 2em;
+	width: 50%;
 }
 
 .boldtext {
@@ -25,13 +31,22 @@ body {
 }
 
 h1 {
+	background-color: #16355b;
+	color: #eee;
+	line-height: 4em;
+	margin: 0;
+	text-align: center;
+}
+
+h2 {
 	margin: 0;
 	padding: 0;
 }
 
-h3 {
-	margin: 0;
-	padding: 0;
+hr {
+	border: 0;
+	height: 1px;
+	background-image: linear-gradient(to right, rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0));
 }
 
 .jsontextbox {
@@ -42,8 +57,29 @@ h3 {
 	padding: 1em;
 }
 
+#lastupdateapi {
+	background-color: #fff;
+	bottom: 0;
+	color: #000;
+	line-height: 1em;
+	margin: 0;
+	opacity: 0.5;
+	padding: 0.5em;
+	position: fixed;
+	right: 0;
+}
+
+#lastupdateexample {
+	height: 3em;
+	line-height: 3em;
+}
+
 li {
-	line-height: 1.75em;
+	line-height: 1.85em;
+}
+
+p {
+	line-height: 1.5em;
 }
 
 .referencelink {
