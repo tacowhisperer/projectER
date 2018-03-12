@@ -45,6 +45,10 @@
 
 			// Attach the example JSON to the /Baker, /North, /Seibel, /SidRich/ South, and /West list entry
 			loadJsonExampleText("resources/locationmenu.html", document.getElementById("locationmenuapi"));
+
+			// Add the current page url to the descriptor on the Getting Started section
+			let urlTextNode = document.createTextNode(document.URL);
+			document.getElementById("thisurl").appendChild(urlTextNode);
 		
 			// Add the date since the last time the server updated
 			let lastUpdateRequest = createAjaxCall("/LastUpdate", lastUpdateText => {
@@ -174,7 +178,7 @@
 
 		<h2 id="gettingstarted">Getting Started</h2>
 		<hr>
-		<p>Simply create your own application that can make GET requests over the internet to <span class="referencelink boldtext" id="thisurl"></span> (this page). Then simply specify which API you want to use and the appropriate response data will be sent. The APIs are outlined in greater detail below.</p>
+		<p>Simply create your own application that can make GET requests over the internet to <span class="referencelink boldtext" id="thisurl"></span> (this page). Then specify which API you want to use and the appropriate response data will be sent. The APIs are outlined in greater detail below.</p>
 
 		<br>
 
