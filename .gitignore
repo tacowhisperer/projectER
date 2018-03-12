@@ -1,2 +1,2 @@
 # These get generated each time the server is started and are for debugging purposes only
-menu_pdfs
+/menu_pdfs/*
