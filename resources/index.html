@@ -13,7 +13,7 @@
 	<link href="https://fonts.googleapis.com/css?family=Ubuntu+Mono" rel="stylesheet"/>
 
 	<!-- Mobile website support -->
-	<meta name="viewport" content="width=device-width, height=device-height, initial-scale=0.75, user-scalable=no, maximum-scale=0.75"/>
+	<meta id="viewport" name="viewport" content="width=device-width, height=device-height, initial-scale=0.75, user-scalable=no, maximum-scale=0.75"/>
 
 	<!-- Theming support for Chrome and Opera -->
 	<meta name="theme-color" content="#16355b"/>
@@ -36,7 +36,19 @@
 		let apiSampleIdx = 0;
 		let firstResize = true;
 
+		// For some reason, Chrome on mobile does not like the viewport tag as given, so we need to adjust it once the DOM has loaded
+		const requiresViewportSizeOne = isChromeMobile();
+
 		window.onload = () => {
+			// Resize the viewport for mobile navigators that require it for a better viewing experience.
+			if (requiresViewportSizeOne) {
+				let viewport = document.getElementById("viewport");
+				let oldViewportContent = viewport.getAttribute("content");
+
+				viewport.setAttribute("content", oldViewportContent.replace(/0\.75/g, "1"));
+			}
+
+
 			// Save the initial window width value
 			let prevWindowWidth = docElem.clientWidth;
 
@@ -163,6 +175,22 @@
 				callback();
 			else
 				setTimeout(finish, 1, callback);
+		}
+
+		function isChromeMobile() {
+			let isChromium = window.chrome;
+			let winNav = window.navigator;
+			let vendorName = winNav.vendor;
+			let isOpera = winNav.userAgent.indexOf("OPR") > -1;
+			let isIEedge = winNav.userAgent.indexOf("Edge") > -1;
+			let isIOSChrome = winNav.userAgent.match("CriOS");
+
+			return !isIOSChrome &&
+				isChromium !== null &&
+				typeof isChromium != 'undefined' &&
+				vendorName === "Google Inc." &&
+				isOpera === false &&
+				isIEedge === false;
 		}
 	</script>
 </head>
