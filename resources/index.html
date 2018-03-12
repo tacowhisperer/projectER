@@ -65,7 +65,7 @@
 			loadJsonExampleText("resources/locationmenu.html", document.getElementById("locationmenuapi"));
 
 			// Add the current page url to the descriptor on the Getting Started section
-			let urlTextNode = document.createTextNode(document.URL);
+			let urlTextNode = document.createTextNode(document.URL.replace(/#.*$/, ""));
 			document.getElementById("thisurl").appendChild(urlTextNode);
 		
 			// Add the date since the last time the server updated
@@ -221,7 +221,7 @@
 		<p>The list below shows the different GET requests and outputs of those requests. Note that any text that is in bold in the examples should be interpreted literally.</p>
 		<ul>
 			<li id="weeklymenuapi">
-				<a class="getrequest" href="/WeeklyMenu" target="_blank">&#47;WeeklyMenu</a>: Returns a JSON object (<span class="boldtext">application/json</span>) of the weekly menu for all serveries that have a weekly menu PDF <a href="http://dining.rice.edu/undergraduate-dining/college-serveries/weekly-menus/" target="_blank">here</a>. The format of this JSON object is as follows:
+				<a class="getrequest" href="/WeeklyMenu" target="_blank">&#47;WeeklyMenu</a>: Returns a JSON object (<span class="boldtext">application/json</span>) of the weekly menu for all serveries that have a weekly menu PDF <a class="referencelink" href="http://dining.rice.edu/undergraduate-dining/college-serveries/weekly-menus/" target="_blank">here</a>. The format of this JSON object is as follows:
 
 				<br>
 			</li>
@@ -252,11 +252,11 @@
 			<br>
 
 			<li>
-				<a class="getrequest" href="/LastUpdate" target="_blank">&#47;LastUpdate</a>: Returns text (<span class="boldtext">text/plain</span>) of the last time the server obtained information from the Rice Dining page. Note that this time is local to the server and not the calling machine. The returned HTML is formatted as follows:
+				<a class="getrequest" href="/LastUpdate" target="_blank">&#47;LastUpdate</a>: Returns text (<span class="boldtext">text/plain</span>) of the last time the server obtained information from the Rice Dining page. Note that this time is local to the server and not the calling machine. The returned HTML is formatted as highlighted in the following pseudo-regex pattern:
 
 				<br>
 
-				<pre class="jsontextbox" id="lastupdateexample"><b>Last Menu Update: </b>YYYY<b>-</b>M?M<b>-</b>D?D HH<b>:</b>MM<b>:</b>SS <b>GMT</b>[+-]\d+ <b>(</b>Timezone String<b>)</b></pre>
+				<pre class="jsontextbox" id="lastupdateexample"><b>Last Menu Update: </b>YYYY<b>-</b>M?M<b>-</b>D?D HH<b>:</b>MM<b>:</b>SS <b>GMT</b>[+-]\d+ <b>(</b>.+<b>)</b></pre>
 			</li>
 		</ul>
 
@@ -270,7 +270,7 @@
 
 		<h2 id="troubleshooting">Troubleshooting</h2>
 		<hr>
-		<p>If you can see this page, it means that the server is up and running as expected. However, if something is not behaving as it should be, send a message to either Andres (<a href="mailto:as100@rice.edu">as100@rice.edu</a>) or Jade (<a href="mailto:jcd7@rice.edu">jcd7@rice.edu</a>) to fix it as soon as possible.</p>
+		<p>If you can see this page, it means that the server is up and running as expected. However, if something is not behaving as it should be, send a message to either Andres (<a class="referencelink" href="mailto:as100@rice.edu">as100@rice.edu</a>) or Jade (<a class="referencelink" href="mailto:jcd7@rice.edu">jcd7@rice.edu</a>) to fix it as soon as possible.</p>
 
 		<br>
 
