@@ -23,7 +23,7 @@ body {
 }
 
 .getrequest {
-	background-color: #ececec;
+	background-color: #e0e0e0;
 	border: 1px solid #aaa;
 	color: #555;
 	font-family: "Courier New", Courier, monospace;
@@ -59,7 +59,7 @@ hr {
 }
 
 .jsontextbox {
-	background-color: #ececec;
+	background-color: #e0e0e0;
 	display: inline-block;
 	height: 20em;
 	overflow: auto;
