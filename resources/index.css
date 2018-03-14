@@ -62,7 +62,6 @@ hr {
 .iconline {
 	background-color: #ccc;;
 	margin: 0;
-	opacity: 1;
 	padding: 0;
 	position: absolute;
 	transform: translateY(0px) rotate(0deg);

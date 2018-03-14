@@ -195,6 +195,7 @@ function installNavbarButtonFunctionality() {
 	const ICON_LINE_WIDTH = 0.4 * navbarWidth;
 	const COMPRESSION = 2;
 	const NUM_DIVISIONS = COMPRESSION * (NUM_ICON_LINES + 1);
+	const ROTATION = 0;
 
 	// Add the necessary attributes and dimensions to make them look good.
 	const iconlineAttr = "iconline";
@@ -223,7 +224,7 @@ function installNavbarButtonFunctionality() {
 	 */
 	// Holds the animator that handles all of the animation processes
 	const navbarAnimator = new SimpleCSSAnimator();
-	const ANIMATION_DURATION = 75;
+	const ANIMATION_DURATION = 100;
 
 	// Holds the animations that will animate the different parts of the navbar button.
 	let forwardNavbarIconLineInterruptableAnimations = [];
@@ -237,7 +238,7 @@ function installNavbarButtonFunctionality() {
 				css: "transform",
 				cssFormatString: "translateY(%dpx) rotate(%ddeg)",
 				startValues: [0, 0], // dynamic
-				endValues: [navbarHeight / 2, 45],
+				endValues: [navbarHeight / 2 - +iconLines[i].style.top.replace(/\D+$/, ""), 45 + ROTATION],
 				duration: ANIMATION_DURATION
 			}]);
 
@@ -245,7 +246,7 @@ function installNavbarButtonFunctionality() {
 				targetElement: iconLines[i],
 				css: "transform",
 				cssFormatString: "translateY(%dpx) rotate(%ddeg)",
-				startValues: [navbarHeight / 2, 45], // dynamic
+				startValues: [navbarHeight / 2 - +iconLines[i].style.top.replace(/\D+$/, ""), 45 + ROTATION], // dynamic
 				endValues: [0, 0],
 				duration: ANIMATION_DURATION
 			}]);
@@ -258,7 +259,7 @@ function installNavbarButtonFunctionality() {
 				css: "transform",
 				cssFormatString: "translateY(%dpx) rotate(%ddeg)",
 				startValues: [0, 0], // dynamic
-				endValues: [-navbarHeight / 2, -45],
+				endValues: [navbarHeight / 2 - +iconLines[i].style.top.replace(/\D+$/, ""), -45 - ROTATION],
 				duration: ANIMATION_DURATION
 			}]);
 
@@ -266,7 +267,7 @@ function installNavbarButtonFunctionality() {
 				targetElement: iconLines[i],
 				css: "transform",
 				cssFormatString: "translateY(%dpx) rotate(%ddeg)",
-				startValues: [-navbarHeight / 2, -45], // dynamic
+				startValues: [navbarHeight / 2 - +iconLines[i].style.top.replace(/\D+$/, ""), -45 - ROTATION], // dynamic
 				endValues: [0, 0],
 				duration: ANIMATION_DURATION
 			}]);
@@ -340,12 +341,30 @@ function installNavbarButtonFunctionality() {
 
 					// The first icon line will become the downward diagonal
 					if (i == 0) {
+						let iconLine = animations[0].targetElement;
+						let currentTransform = iconLine.style.transform;
 
+						if (currentTransform === "") {
+							iconLine.style.transform = "translateY(0px) rotate(0deg)";
+							currentTransform = iconLine.style.transform;
+						}
+
+						animations[0].startValues = getTransformValues(currentTransform);
+						navbarAnimator.animate(animations[0]);
 					}
 
 					// The last icon line will become the upward diagonal
 					else if (i == NUM_ICON_LINES - 1) {
+						let iconLine = animations[0].targetElement;
+						let currentTransform = iconLine.style.transform;
 
+						if (currentTransform === "") {
+							iconLine.style.transform = "translateY(0px) rotate(0deg)";
+							currentTransform = iconLine.style.transform;
+						}
+
+						animations[0].startValues = getTransformValues(currentTransform);
+						navbarAnimator.animate(animations[0]);
 					}
 
 					// All other icons shrink in size and opacity
@@ -378,19 +397,43 @@ function installNavbarButtonFunctionality() {
 					let animations = backwardNavbarIconLineInterruptableAnimations[i];
 
 					// The first icon line will become the downward diagonal
+					// The first icon line will become the downward diagonal
 					if (i == 0) {
+						let iconLine = animations[0].targetElement;
+						let currentTransform = iconLine.style.transform;
 
+						if (currentTransform === "") {
+							iconLine.style.transform = "translateY(0px) rotate(0deg)";
+							currentTransform = iconLine.style.transform;
+						}
+
+						animations[0].startValues = getTransformValues(currentTransform);
+						navbarAnimator.animate(animations[0]);
 					}
 
 					// The last icon line will become the upward diagonal
 					else if (i == NUM_ICON_LINES - 1) {
+						let iconLine = animations[0].targetElement;
+						let currentTransform = iconLine.style.transform;
 
+						if (currentTransform === "") {
+							iconLine.style.transform = "translateY(0px) rotate(0deg)";
+							currentTransform = iconLine.style.transform;
+						}
+
+						animations[0].startValues = getTransformValues(currentTransform);
+						navbarAnimator.animate(animations[0]);
 					}
 
 					// All other icons shrink in size and opacity
 					else {
 						let iconLine = animations[0].targetElement;
-						let currentOpacity = +iconLine.style.opacity;
+						let currentOpacity = iconLine.style.opacity;
+						if (currentOpacity === "")
+							currentOpacity = 1;
+						else
+							currentOpacity = +currentOpacity;
+
 						let currentWidth = +iconLine.style.width.replace(/\s*\D*$/, "");
 						let currentLeft = +iconLine.style.left.replace(/\s*\D*$/, "");
 
@@ -434,6 +477,22 @@ function installNavbarButtonFunctionality() {
 
 	// Fire a scroll event so that the navbar element is correctly positioned on initialization.
 	window.dispatchEvent(new Event("scroll"));
+
+	// Extract the values from the transform css
+	function getTransformValues(transformCSS) {
+		return transformCSS
+			// Split by spaces
+			.match(/\S+\)/g)
+
+			// Remove transformation function names
+			.map(prop => prop.replace(/^[^(]+/, ""))
+
+			// Remove parenthesis and unit strings
+			.map(prop => prop.replace(/\(|\)|\D+$/g, ""))
+
+			// Cast the strings to numbers
+			.map(prop => +prop);
+	}
 }
 
 function SimpleCSSAnimator() {
