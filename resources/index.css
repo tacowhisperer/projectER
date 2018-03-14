@@ -59,6 +59,15 @@ hr {
 	background-image: linear-gradient(to right, rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0));
 }
 
+.iconline {
+	background-color: #ccc;;
+	margin: 0;
+	opacity: 1;
+	padding: 0;
+	position: absolute;
+	transform: translateY(0px) rotate(0deg);
+}
+
 .jsontextbox {
 	background-color: #e0e0e0;
 	display: inline-block;
@@ -90,12 +99,13 @@ li {
 	height: 3em;
 	margin: 0;
 	padding: 0;
+	position: relative;
 	width: 100%;
 }
 
 #navbar {
-	background-color: #eee;
-	border: 2px solid #16355b;
+	background-color: #16355b;
+	border-radius: 1.5em;
 	cursor: pointer;
 	height: 3em;
 	left: 1.5em;

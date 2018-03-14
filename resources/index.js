@@ -11,7 +11,11 @@ let apiSampleIdx = 0;
 let firstResize = true;
 let prevWindowWidth = 0;
 
-window.onload = () => {
+/**
+ * This code executes once the DOM has fully loaded. It performs the necessary setups and handling to have an impactful
+ * but responsive homepage.
+ */
+window.addEventListener("load", () => {
 	// Resize the viewport for mobile navigators that require it for a better viewing experience.
 	adjustMobileViewport();
 
@@ -23,7 +27,7 @@ window.onload = () => {
 
 	// Populate the body div with extra content.
 	loadAsynchronousContent(document.getElementById("bodydiv"));
-};
+});
 
 function loadJsonExampleText(htmlPath, tE) {
 	// Get the location that this example is registered on in the apiSamples array.
@@ -170,9 +174,244 @@ function loadAsynchronousContent(bodyDiv) {
 }
 
 function installNavbarButtonFunctionality() {
-	let welcomeMsg = document.getElementById("welcomemsg");
-	let navbarDiv = document.getElementById("navbardiv");
+	/**
+	 * First we get the elements that we need from the DOM.
+	 */
+	const welcomeMsg = document.getElementById("welcomemsg");
+	const navbarDiv = document.getElementById("navbardiv");
+	const navbar = document.getElementById("navbar");
 
+	// Define the size of the navbar button
+	let navbarRect = navbar.getBoundingClientRect();
+	const navbarWidth = navbarRect.width;
+	const navbarHeight = navbarRect.height;
+
+	/**
+	 * Here we are adding all of the missing elements to the navbar DOM element.
+	 */
+	// Define the constants associated with the icon lines that will go on the navbar button.
+	const NUM_ICON_LINES = 3;
+	const ICON_LINE_HEIGHT = 2;
+	const ICON_LINE_WIDTH = 0.4 * navbarWidth;
+	const COMPRESSION = 2;
+	const NUM_DIVISIONS = COMPRESSION * (NUM_ICON_LINES + 1);
+
+	// Add the necessary attributes and dimensions to make them look good.
+	const iconlineAttr = "iconline";
+	const iconLines = [];
+	for (let i = 1; i <= NUM_ICON_LINES; i++) {
+		let iconLine = document.createElement("div");
+
+		iconLine.classList.add(iconlineAttr);
+		iconLine.id = iconlineAttr + i;
+		iconLine.style.height = ICON_LINE_HEIGHT + "px";
+
+		// Calculate the icon line's position on the navbar button
+		iconLine.style.top = ((i + NUM_DIVISIONS / 4) * navbarHeight / NUM_DIVISIONS - Math.floor(ICON_LINE_HEIGHT / 2)) + "px";
+		iconLine.style.width = ICON_LINE_WIDTH + "px";
+		iconLine.style.left = ((navbarWidth - ICON_LINE_WIDTH) / 2) + "px";
+
+		// Add the new element to the array of elements being created
+		iconLines.push(iconLine);
+
+		// Add the new element to the navbar
+		navbar.appendChild(iconLine);
+	}
+
+	/**
+	 * Here we are defining the animations that will take place when the navbar button is clicked.
+	 */
+	// Holds the animator that handles all of the animation processes
+	const navbarAnimator = new SimpleCSSAnimator();
+	const ANIMATION_DURATION = 75;
+
+	// Holds the animations that will animate the different parts of the navbar button.
+	let forwardNavbarIconLineInterruptableAnimations = [];
+	let backwardNavbarIconLineInterruptableAnimations = [];
+
+	for (let i = 0; i < NUM_ICON_LINES; i++) {
+		// The first icon line will become the downward diagonal
+		if (i == 0) {
+			forwardNavbarIconLineInterruptableAnimations.push([{
+				targetElement: iconLines[i],
+				css: "transform",
+				cssFormatString: "translateY(%dpx) rotate(%ddeg)",
+				startValues: [0, 0], // dynamic
+				endValues: [navbarHeight / 2, 45],
+				duration: ANIMATION_DURATION
+			}]);
+
+			backwardNavbarIconLineInterruptableAnimations.push([{
+				targetElement: iconLines[i],
+				css: "transform",
+				cssFormatString: "translateY(%dpx) rotate(%ddeg)",
+				startValues: [navbarHeight / 2, 45], // dynamic
+				endValues: [0, 0],
+				duration: ANIMATION_DURATION
+			}]);
+		}
+
+		// The last icon line will become the upward diagonal
+		else if (i == NUM_ICON_LINES - 1) {
+			forwardNavbarIconLineInterruptableAnimations.push([{
+				targetElement: iconLines[i],
+				css: "transform",
+				cssFormatString: "translateY(%dpx) rotate(%ddeg)",
+				startValues: [0, 0], // dynamic
+				endValues: [-navbarHeight / 2, -45],
+				duration: ANIMATION_DURATION
+			}]);
+
+			backwardNavbarIconLineInterruptableAnimations.push([{
+				targetElement: iconLines[i],
+				css: "transform",
+				cssFormatString: "translateY(%dpx) rotate(%ddeg)",
+				startValues: [-navbarHeight / 2, -45], // dynamic
+				endValues: [0, 0],
+				duration: ANIMATION_DURATION
+			}]);
+		}
+
+		// All other icons shrink in size and opacity
+		else {
+			forwardNavbarIconLineInterruptableAnimations.push([{
+				targetElement: iconLines[i],
+				css: "opacity",
+				cssFormatString: "%d",
+				startValues: [1], // dynamic
+				endValues: [0],
+				duration: ANIMATION_DURATION
+			}, {
+				targetElement: iconLines[i],
+				css: "width",
+				cssFormatString: "%dpx",
+				startValues: [ICON_LINE_WIDTH], // dynamic
+				endValues: [0],
+				duration: ANIMATION_DURATION
+			}, {
+				targetElement: iconLines[i],
+				css: "left",
+				cssFormatString: "%dpx",
+				startValues: [(navbarWidth - ICON_LINE_WIDTH) / 2], // dynamic
+				endValues: [navbarWidth / 2],
+				duration: ANIMATION_DURATION
+			}]);
+
+			backwardNavbarIconLineInterruptableAnimations.push([{
+				targetElement: iconLines[i],
+				css: "opacity",
+				cssFormatString: "%d",
+				startValues: [0], // dynamic
+				endValues: [1],
+				duration: ANIMATION_DURATION
+			}, {
+				targetElement: iconLines[i],
+				css: "width",
+				cssFormatString: "%dpx",
+				startValues: [0], // dynamic
+				endValues: [ICON_LINE_WIDTH],
+				duration: ANIMATION_DURATION
+			}, {
+				targetElement: iconLines[i],
+				css: "left",
+				cssFormatString: "%dpx",
+				startValues: [navbarWidth / 2], // dynamic
+				endValues: [(navbarWidth - ICON_LINE_WIDTH) / 2],
+				duration: ANIMATION_DURATION
+			}]);
+		}
+	}
+
+	let navbarActive = false;
+	let mousedownTarget = null;
+	document.addEventListener("mousedown", e => mousedownTarget = e.target);
+	navbar.addEventListener("mouseup", e => {
+		if (Object.is(mousedownTarget, e.target)) {
+			// First stop the animator of all animations that may be in play.
+			navbarAnimator.removeAll();
+
+			// The button was just fully clicked, so change its active state and perform the appropriate actions.	
+			navbarActive = !navbarActive;
+
+			if (navbarActive) {
+				// Animate the navbar icon lines forward (to the "X" state).
+				for (let i = 0; i < forwardNavbarIconLineInterruptableAnimations.length; i++) {
+					let animations = forwardNavbarIconLineInterruptableAnimations[i];
+
+					// The first icon line will become the downward diagonal
+					if (i == 0) {
+
+					}
+
+					// The last icon line will become the upward diagonal
+					else if (i == NUM_ICON_LINES - 1) {
+
+					}
+
+					// All other icons shrink in size and opacity
+					else {
+						let iconLine = animations[0].targetElement;
+						let currentOpacity = iconLine.style.opacity;
+						if (currentOpacity === "")
+							currentOpacity = 1;
+						else
+							currentOpacity = +currentOpacity;
+
+						let currentWidth = +iconLine.style.width.replace(/\s*\D*$/, "");
+						let currentLeft = +iconLine.style.left.replace(/\s*\D*$/, "");
+
+						// Update the dynamic values of the animation object so that interruptions are smooth.
+						animations[0].startValues = [currentOpacity];
+						animations[1].startValues = [currentWidth];
+						animations[2].startValues = [currentLeft];
+
+						// Add the animations to the animator
+						for (let j = 0; j < animations.length; j++)
+							navbarAnimator.animate(animations[j]);
+					}
+				}
+			}
+
+			else {
+				// Animate the navbar icons backward (to the horizontal state).
+				for (let i = 0; i < backwardNavbarIconLineInterruptableAnimations.length; i++) {
+					let animations = backwardNavbarIconLineInterruptableAnimations[i];
+
+					// The first icon line will become the downward diagonal
+					if (i == 0) {
+
+					}
+
+					// The last icon line will become the upward diagonal
+					else if (i == NUM_ICON_LINES - 1) {
+
+					}
+
+					// All other icons shrink in size and opacity
+					else {
+						let iconLine = animations[0].targetElement;
+						let currentOpacity = +iconLine.style.opacity;
+						let currentWidth = +iconLine.style.width.replace(/\s*\D*$/, "");
+						let currentLeft = +iconLine.style.left.replace(/\s*\D*$/, "");
+
+						// Update the dynamic values of the animation object so that interruptions are smooth.
+						animations[0].startValues = [currentOpacity];
+						animations[1].startValues = [currentWidth];
+						animations[2].startValues = [currentLeft];
+
+						// Add the animations to the animator
+						for (let j = 0; j < animations.length; j++)
+							navbarAnimator.animate(animations[j]);
+					}
+				}
+			}
+		}
+	});
+
+	/**
+	 * Here we are doing the necessary setup to position the navbar button to be permanently on the screen,
+	 * but in a cool way.
+	 */
 	// Holds the amount of space between the welcome message h1 header and the navbar div.
 	const offset = navbarDiv.getBoundingClientRect().top - welcomeMsg.getBoundingClientRect().bottom;
 
@@ -203,14 +442,15 @@ function SimpleCSSAnimator() {
 
 	let animations = {};
 
-	// Holds the requestAnimationFrame ID to cancel it later.
-	var eventLoopID;
-	eventLoop();
+	// Holds the requestAnimationFrame ID to cancel it later. Is false if the loop is not running.
+	var eventLoopID = false;
 
 	function eventLoop() {
 		let tCurr = new Date().getTime();
+		let numAnimations = 0;
 
 		for (let animationID in animations) {
+			numAnimations++;
 			let animation = animations[animationID];
 
 			if (animation.active) {
@@ -264,7 +504,10 @@ function SimpleCSSAnimator() {
 		for (let i = 0; i < keysToRemove.length; i++)
 			delete animations[keysToRemove[i]];
 
-		eventLoopID = requestAnimationFrame(eventLoop);
+		if (numAnimations > 0)
+			eventLoopID = requestAnimationFrame(eventLoop);
+		else
+			eventLoopID = false;
 	}
 
 	this.animate = function(options) {
@@ -293,6 +536,10 @@ function SimpleCSSAnimator() {
 
 		animations[animationID] = animation;
 
+		// Restart the animation loop if it had been stopped due to lack of animations.
+		if (!eventLoopID)
+			eventLoopID = eventLoop();
+
 		return animationID;
 	};
 
@@ -315,6 +562,9 @@ function SimpleCSSAnimator() {
 			animation.active = true;
 		}
 
+		if (!eventLoopID)
+			eventLoopID = eventLoop();
+
 		return this;
 	};
 
@@ -325,11 +575,19 @@ function SimpleCSSAnimator() {
 		return this;
 	};
 
+	this.removeAll = function() {
+		for (let animationID in animations)
+			delete animations[animationID];
+
+		return this;
+	}
+
 	this.pauseAll = function() {
 		for (let animationID in animations)
 			this.pauseAnimation(animationID);
 
 		cancelAnimationFrame(eventLoopID);
+		eventLoopID = false;
 
 		return this;
 	};
@@ -338,11 +596,13 @@ function SimpleCSSAnimator() {
 		for (let animationID in animations)
 			this.playAnimation(animationID);
 
-		eventLoopID = eventLoop();
+		if (!eventLoopID)
+			eventLoopID = eventLoop();
 
 		return this;
 	};
 
+	// Returns a deep copy of the internal state of the animations at the time of calling.
 	this.animations = function() {
 		return JSON.parse(JSON.stringify(animations));
 	};
