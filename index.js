@@ -28,6 +28,7 @@ const daysOfTheWeek = ["sunday", "monday", "tuesday", "wednesday", "thursday", "
 // Holds the response page for the / GET request
 const welcomeHTML = fs.readFileSync('resources/index.html', 'utf8');
 const welcomeCSS = fs.readFileSync('resources/index.css', 'utf8');
+const welcomeJS = fs.readFileSync('resources/index.js', 'utf8');
 const weeklyMenuHTML = fs.readFileSync('resources/weeklymenu.html', 'utf8');
 const todayMenuHTML = fs.readFileSync('resources/todaymenu.html', 'utf8');
 const locationMenuHTML = fs.readFileSync('resources/locationmenu.html', 'utf8');
@@ -152,6 +153,11 @@ function start() {
 		app.get(/(resources)?\/?index\.css/i, (request, response) => {
 			response.type('css');
 			response.send(welcomeCSS);
+		});
+
+		app.get(/(resources)?\/?index\.js/i, (request, response) => {
+			response.type('js');
+			response.send(welcomeJS);
 		});
 
 		app.get(/(resources)?\/?weeklymenu\.html/i, (request, response) => {

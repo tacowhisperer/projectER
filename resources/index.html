@@ -24,180 +24,23 @@
 	<!-- Page CSS -->
 	<link href="resources/index.css" rel="stylesheet"/>
 
-	<!-- Fixes the awkward sizes of the JSON sample blocks. -->
-	<script>
-		// Get the document element
-		const docElem = document.documentElement;
-
-		const IDEAL_WIDTH = 650;
-		const WINDOW_WIDTH_RATIO = 0.55;
-
-		let apiSamples = [];
-		let apiSampleIdx = 0;
-		let firstResize = true;
-
-		// For some reason, Chrome on mobile does not like the viewport tag as given, so we need to adjust it once the DOM has loaded
-		const requiresViewportSizeOne = isChromeMobile();
-
-		window.onload = () => {
-			// Resize the viewport for mobile navigators that require it for a better viewing experience.
-			if (requiresViewportSizeOne) {
-				let viewport = document.getElementById("viewport");
-				let oldViewportContent = viewport.getAttribute("content");
-
-				viewport.setAttribute("content", oldViewportContent.replace(/0\.75/g, "1"));
-			}
-
-
-			// Save the initial window width value
-			let prevWindowWidth = docElem.clientWidth;
-
-			// Get the bodydiv element
-			const bodyDiv = document.getElementById("bodydiv");
-
-			// Attach the example JSON to the /WeeklyMenu list entry
-			loadJsonExampleText("resources/weeklymenu.html", document.getElementById("weeklymenuapi"));
-
-			// Attach the example JSON to the /Today list entry
-			loadJsonExampleText("resources/todaymenu.html", document.getElementById("todaymenuapi"));
-
-			// Attach the example JSON to the /Baker, /North, /Seibel, /SidRich/ South, and /West list entry
-			loadJsonExampleText("resources/locationmenu.html", document.getElementById("locationmenuapi"));
-
-			// Add the current page url to the descriptor on the Getting Started section
-			let urlTextNode = document.createTextNode(document.URL.replace(/#.*$/, ""));
-			document.getElementById("thisurl").appendChild(urlTextNode);
-		
-			// Add the date since the last time the server updated
-			let lastUpdateRequest = createAjaxCall("/LastUpdate", lastUpdateText => {
-				// Create the new element to be appended to the target element
-				let newElement = document.createElement("p");
-
-				// Set the ID tag so that the CSS may style it.
-				newElement.id = "lastupdateapi";
-
-				// Create the node that holds the text
-				let newElementText = document.createTextNode(lastUpdateText);
-
-				newElement.appendChild(newElementText);
-
-				// The target element in this case is the bodyDiv element
-				let targetElement = document.getElementById("bodydiv");
-
-				// Append it to the end of the target element.
-				targetElement.appendChild(newElement);
-			}, status => console.error("Request for '/LastUpdate' failed with status " + status));
-			lastUpdateRequest.send();
-
-			// Wait until all async JSON example requests have completed to commence resizing handlers
-			finish(() => {
-				let examples = document.getElementsByClassName("jsontextbox");
-
-				// Handle the elements that require dynamic resizing.
-				window.onresize = () => {
-					// If the new window height change is significant, update the window height value used for calculating the body width
-					let resizeBodyDiv = firstResize || prevWindowWidth != docElem.clientWidth;
-
-					// Make sure that the main text of the body looks good
-					if (resizeBodyDiv) {
-						bodyDiv.style.width = ((WINDOW_WIDTH_RATIO + (docElem.clientWidth > window.innerHeight ? 0 : (1 - docElem.clientWidth / window.innerHeight) * (1 - WINDOW_WIDTH_RATIO))) * docElem.clientWidth) + "px";
-
-						firstResize = false;
-						prevWindowWidth = docElem.clientWidth;
-					}
-
-					// Resize the API example text boxes
-					for (let i = 0; i < examples.length; i++) {
-						let apiSample = examples[i];
-						let apiSampleRect = apiSample.getBoundingClientRect();
-
-						apiSample.style.width = docElem.clientWidth - 2 * apiSampleRect.x + "px";
-					}
-				};
-
-				// Fire a resize event so that the elements are sized correctly upon initiation
-				window.dispatchEvent(new Event("resize"));
-			});
-		};
-
-		function loadJsonExampleText(htmlPath, tE) {
-			// Get the location that this example is registered on in the apiSamples array.
-			const targetIdx = apiSampleIdx++;
-			const targetElement = tE;
-
-			// Register the new entry in the apiSamples array.
-			apiSamples[targetIdx] = null;
-
-			let xhttp = createAjaxCall(htmlPath, responseText => {
-				// Create the new element to be appended to the target element
-				let newElement = document.createElement("p");
-
-				// Set the element's attributes
-				newElement.innerHTML = responseText;
-
-				// Append it to the end of the target element.
-				while (newElement.firstChild)
-					targetElement.appendChild(newElement.firstChild);
-
-				apiSamples[targetIdx] = targetElement.lastChild;
-			}, status => console.error("Request for '" + htmlPath + "' failed with status " + status));
-
-			// Delaying sending the request allows the finish function a chance to detect that a new entry has been added.
-			setTimeout(() => xhttp.send(), 5);
-		}
-
-		function createAjaxCall(requestPath, successCallback, failCallback) {
-			let xhttp = new XMLHttpRequest();
-
-			xhttp.onreadystatechange = function () {
-				if (this.readyState == 4 && this.status == 200)
-					successCallback(this.responseText);
-
-				else if (this.readyState == 4)
-					failCallback(this.status);
-			};
-
-			xhttp.open("GET", requestPath, true);
-
-			return xhttp;
-		}
-
-		function finish(callback) {
-			let ready = apiSamples.length;
-			for (let i = 0; i < apiSamples.length; i++) {
-				if (apiSamples[i] == null || apiSamples[i] == undefined) {
-					ready = false;
-					break;
-				}
-			}
-
-			if (ready) 
-				callback();
-			else
-				setTimeout(finish, 1, callback);
-		}
-
-		function isChromeMobile() {
-			let isChromium = window.chrome;
-			let winNav = window.navigator;
-			let vendorName = winNav.vendor;
-			let isOpera = winNav.userAgent.indexOf("OPR") > -1;
-			let isIEedge = winNav.userAgent.indexOf("Edge") > -1;
-			let isIOSChrome = winNav.userAgent.match("CriOS");
-
-			return !isIOSChrome &&
-				isChromium !== null &&
-				typeof isChromium != 'undefined' &&
-				vendorName === "Google Inc." &&
-				isOpera === false &&
-				isIEedge === false;
-		}
-	</script>
+	<!-- Provides functionality for resizing elements when the screen changes, support for AJAX requests, among other things. -->
+	<script src="resources/index.js"></script>
 </head>
 
 <body>
-	<h1>Welcome to Project-ER!</h1>
+	<div id="welcomediv">
+		<h1 id="welcomemsg">Welcome to Project-ER!</h1>
+
+		<!-- Holds the "real" navbar that is either static or fixed depending on the scroll of the page. -->
+<!-- 		<div class="navbar" id="navbardiv"><div id="navbar"></div></div> -->
+	</div>
+
+	<!-- Holds the main content of the homepage -->
 	<div id="bodydiv">
+		<!-- Creates the space that the "real" navbar would occupy -->
+<!-- 		<div class="navbar" id="navbarplaceholder"></div> -->
+
 		<h2 id="about">About Project-ER</h2>
 		<hr>
 		<p>Project-ER, namely Project Eat Rice, is written in JavaScript using <a class="referencelink boldtext" href="https://nodejs.org/en/" target="_blank">Node.js</a> + <a class="referencelink boldtext" href="https://expressjs.com/" target="_blank">Express</a> + <a class="referencelink boldtext" href="https://www.npmjs.com/package/download-file" target="_blank">download-file</a> + <a class="referencelink boldtext" href="https://www.npmjs.com/package/pdf2json" target="_blank">pdf2json</a>. </p>
@@ -221,7 +64,7 @@
 		<p>The list below shows the different GET requests and outputs of those requests. Note that any text that is in bold in the examples should be interpreted literally.</p>
 		<ul>
 			<li id="weeklymenuapi">
-				<a class="getrequest" href="/WeeklyMenu" target="_blank">&#47;WeeklyMenu</a>: Returns a JSON object (<span class="boldtext">application/json</span>) of the weekly menu for all serveries that have a weekly menu PDF <a class="referencelink" href="http://dining.rice.edu/undergraduate-dining/college-serveries/weekly-menus/" target="_blank">here</a>. The format of this JSON object is as follows:
+				<a class="getrequest" href="/WeeklyMenu" target="_blank">&#47;WeeklyMenu</a>: Returns a JSON object (<span class="boldtext">application/json</span>) of the weekly menu for all serveries that have a weekly menu PDF <a class="referencelink boldtext" href="http://dining.rice.edu/undergraduate-dining/college-serveries/weekly-menus/" target="_blank">here</a>. The format of this JSON object is as follows:
 
 				<br>
 			</li>
@@ -264,13 +107,13 @@
 
 		<h2 id="thedevteam">The Developer Team</h2>
 		<hr>
-		<p>Project-ER was spearheaded by Rice University undergraduate students <a class="referencelink" href="https://github.com/DrProfSgtMrJ" target="_blank">Jade Dever Matthews</a> and <a class="referencelink" href="https://github.com/tacowhisperer" target="_blank">Andres Salgado</a>. Both developers are aspiring CS majors, and enjoy a good game of Smash Brothers after class.</p>
+		<p>Project-ER was spearheaded by Rice University undergraduate students <a class="referencelink boldtext" href="https://github.com/DrProfSgtMrJ" target="_blank">Jade Dever Matthews</a> and <a class="referencelink boldtext" href="https://github.com/tacowhisperer" target="_blank">Andres Salgado</a>. Both developers are aspiring CS majors, and enjoy a good game of Smash Brothers after class.</p>
 
 		<br>
 
 		<h2 id="troubleshooting">Troubleshooting</h2>
 		<hr>
-		<p>If you can see this page, it means that the server is up and running as expected. However, if something is not behaving as it should be, send a message to either Andres (<a class="referencelink" href="mailto:as100@rice.edu">as100@rice.edu</a>) or Jade (<a class="referencelink" href="mailto:jcd7@rice.edu">jcd7@rice.edu</a>) to fix it as soon as possible.</p>
+		<p>If you can see this page, it means that the server is up and running as expected. However, if something is not behaving as it should be, send a message to either Andres (<a class="referencelink boldtext" href="mailto:as100@rice.edu">as100@rice.edu</a>) or Jade (<a class="referencelink boldtext" href="mailto:jcd7@rice.edu">jcd7@rice.edu</a>) to fix it as soon as possible.</p>
 
 		<br>
 
