@@ -4,12 +4,18 @@ const docElem = document.documentElement;
 // For some reason, Chrome on mobile does not like the viewport tag as given, so we need to adjust it once the DOM has loaded
 const requiresViewportSizeOne = isChromeMobile();
 
+// Holds the ratio of the window width that the body div should cover.
 const WINDOW_WIDTH_RATIO = 0.55;
 
+// Used for handling the AJAX calls
 let apiSamples = [];
 let apiSampleIdx = 0;
 let firstResize = true;
 let prevWindowWidth = 0;
+
+// Holds the animator that handles all of the animation processes
+const navbarAnimator = new SimpleCSSAnimator();
+const ANIMATION_DURATION = 150;
 
 /**
  * This code executes once the DOM has fully loaded. It performs the necessary setups and handling to have an impactful
@@ -20,7 +26,7 @@ window.addEventListener("load", () => {
 	adjustMobileViewport();
 
 	// Adds the navigation functionality to the navbar button and positions it dynamically on the page.
-	// installNavbarButtonFunctionality();
+	installNavbarButtonFunctionality();
 
 	// Add the current page url to the descriptor on the Getting Started section
 	document.getElementById("thisurl").appendChild(document.createTextNode(document.URL.replace(/#.*$/, "")));
@@ -226,7 +232,7 @@ function installNavbarButtonFunctionality() {
 	 */
 	// Set the initial sizes an constraints for the navbar menu
 	const MENU_WIDTH_RATIO = 0.25;
-	const SMALLEST_ACCEPTABLE_MENU_WIDTH = 350;
+	const SMALLEST_ACCEPTABLE_MENU_WIDTH = 330;
 	navbarMenuDiv.style.width = Math.max((MENU_WIDTH_RATIO + (docElem.clientWidth > window.innerHeight ? 0 : (1 - docElem.clientWidth / window.innerHeight) * (1 - MENU_WIDTH_RATIO))) * docElem.clientWidth, SMALLEST_ACCEPTABLE_MENU_WIDTH) + "px";
 
 	// Dynamically resize the navbar menu so that it fits in screens of all sizes
@@ -250,10 +256,6 @@ function installNavbarButtonFunctionality() {
 	/**
 	 * Here we are defining the animations that will take place when the navbar button is clicked.
 	 */
-	// Holds the animator that handles all of the animation processes
-	const navbarAnimator = new SimpleCSSAnimator();
-	const ANIMATION_DURATION = 100;
-
 	// Holds the animations that will animate the different parts of the navbar button.
 	let forwardNavbarIconLineInterruptableAnimations = [];
 	let backwardNavbarIconLineInterruptableAnimations = [];
@@ -351,22 +353,40 @@ function installNavbarButtonFunctionality() {
 		}
 	}
 
+	// Holds the animations that will animate the navbar menu.
+	let forwardNavbarMenuInterruptableAnimations = [{
+		targetElement: navbarMenuDiv,
+		css: "opacity",
+		cssFormatString: "%d",
+		startValues: [0], // dynamic
+		endValues: [1],
+		onAnimationStart: () => navbarMenuDiv.style.display = "inline-block",
+		duration: ANIMATION_DURATION
+	}];
+	
+	let backwardNavbarMenuInterruptableAnimations = [{
+		targetElement: navbarMenuDiv,
+		css: "opacity",
+		cssFormatString: "%d",
+		startValues: [1], // dynamic
+		endValues: [0],
+		onAnimationEnd: () => navbarMenuDiv.style.display = "none",
+		duration: ANIMATION_DURATION
+	}];
+
 	const MOUSE_1 = 1;
 
 	let navbarActive = false;
 	let mousedownTarget = null;
 	document.addEventListener("mousedown", e => mousedownTarget = e.which == MOUSE_1 ? e.target : null);
+	document.addEventListener("mouseup", e => {
+		if (navbarActive && e.which == MOUSE_1 && (e.clientX > navbarMenuDiv.getBoundingClientRect().width || e.clientY < welcomeMsg.getBoundingClientRect().bottom))
+			toggleMenu();
+	});
+
 	navbar.addEventListener("mouseup", e => {
-		if (Object.is(mousedownTarget, e.target) && e.which == MOUSE_1) {
-			// First stop the animator of all animations that may be in play.
-			navbarAnimator.removeAll();
-
-			// The button was just fully clicked, so change its active state and perform the appropriate actions.	
-			navbarActive = !navbarActive;
-
-			// Animtes the icon lines on the navbar button.
-			animateIconLines();
-		}
+		if (Object.is(mousedownTarget, e.target) && e.which == MOUSE_1)
+			toggleMenu();		
 	});
 
 	/**
@@ -403,7 +423,48 @@ function installNavbarButtonFunctionality() {
 	// Fire a scroll event so that the navbar element is correctly positioned on initialization.
 	window.dispatchEvent(new Event("scroll"));
 
-	function animateIconLines() {
+	function toggleMenu() {
+		// First stop the animator of all animations that may be in play.
+		navbarAnimator.removeAll();
+
+		// The button was just fully clicked, so change its active state and perform the appropriate actions.	
+		navbarActive = !navbarActive;
+
+		// Animtes the icon lines on the navbar button.
+		animateNavbarButton();
+
+		if (navbarActive) {
+			for (let i = 0; i < forwardNavbarMenuInterruptableAnimations.length; i++) {
+				let animation = forwardNavbarMenuInterruptableAnimations[i];
+
+				if (i == 0) {
+					let startOpacity = navbarMenuDiv.style.opacity;
+					startOpacity = startOpacity === "" ? 0 : startOpacity;
+
+					animation.startValues = [startOpacity];
+
+					navbarAnimator.animate(animation);
+				}
+			}
+		}
+
+		else {
+			for (let i = 0; i < backwardNavbarMenuInterruptableAnimations.length; i++) {
+				let animation = backwardNavbarMenuInterruptableAnimations[i];
+
+				if (i == 0) {
+					let startOpacity = navbarMenuDiv.style.opacity;
+					startOpacity = startOpacity === "" ? 1 : startOpacity;
+
+					animation.startValues = [startOpacity];
+
+					navbarAnimator.animate(animation);
+				}
+			}
+		}
+	}
+
+	function animateNavbarButton() {
 		if (navbarActive) {
 			// Animate the navbar icon lines forward (to the "X" state).
 			for (let i = 0; i < forwardNavbarIconLineInterruptableAnimations.length; i++) {
@@ -602,8 +663,14 @@ function SimpleCSSAnimator() {
 
 		// Remove any finished animations.
 		let keysToRemove = Object.keys(animations).filter(id => animations[id].finished);
-		for (let i = 0; i < keysToRemove.length; i++)
+		for (let i = 0; i < keysToRemove.length; i++) {
+			let animationID = keysToRemove[i];
+
+			// Call the onAnimationEnd function
+			animations[animationID].onAnimationEnd();
+
 			delete animations[keysToRemove[i]];
+		}
 
 		if (numAnimations > 0)
 			eventLoopID = requestAnimationFrame(eventLoop);
@@ -618,6 +685,8 @@ function SimpleCSSAnimator() {
 		let animationPauseTime = animationStartTime;
 
 		let transformationFunction = options.transformationFunc ? options.transformationFunc : x => x;
+		let animationStartFunc = options.onAnimationStart ? options.onAnimationStart : () => {};
+		let animationEndFunc = options.onAnimationEnd ? options.onAnimationEnd : () => {};
 
 		let animation = {
 			active: true,
@@ -632,6 +701,8 @@ function SimpleCSSAnimator() {
 			startValues: options.startValues,
 			endValues: options.endValues,
 			duration: options.duration,
+			// onAnimationStart: animationStartFunc,
+			onAnimationEnd: animationEndFunc,
 			transformationFunc: transformationFunction
 		};
 
@@ -640,6 +711,9 @@ function SimpleCSSAnimator() {
 		// Restart the animation loop if it had been stopped due to lack of animations.
 		if (!eventLoopID)
 			eventLoopID = eventLoop();
+
+		// Call the onAnimationStat function
+		animationStartFunc();
 
 		return animationID;
 	};

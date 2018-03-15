@@ -18,7 +18,7 @@ body {
 }
 
 #bodydiv{
-	background-color: rgba(249, 249, 249, 0.6);
+	background-color: rgba(245, 245, 245, 0.65);
 	margin-left: auto;
 	margin-right: auto;
 	margin-top: 1em;
@@ -196,8 +196,9 @@ li {
 	background-position: bottom left;
 	border: 1px solid #aaa;
 	box-sizing: border-box;
-	display: inline-block;
+	display: /*inline-block*/ none;
 	left: 0;
+	opacity: 0;
 	overflow: hidden;
 	padding: 6em 0 0 0;
 	position: fixed;
