@@ -180,6 +180,7 @@ function installNavbarButtonFunctionality() {
 	const welcomeMsg = document.getElementById("welcomemsg");
 	const navbarDiv = document.getElementById("navbardiv");
 	const navbar = document.getElementById("navbar");
+	const navbarMenuDiv = document.getElementById("navbarmenudiv");
 
 	// Define the size of the navbar button
 	let navbarRect = navbar.getBoundingClientRect();
@@ -187,7 +188,7 @@ function installNavbarButtonFunctionality() {
 	const navbarHeight = navbarRect.height;
 
 	/**
-	 * Here we are adding all of the missing elements to the navbar DOM element.
+	 * Here we are adding all of the icon lines to the navbar button DOM element.
 	 */
 	// Define the constants associated with the icon lines that will go on the navbar button.
 	const NUM_ICON_LINES = 3;
@@ -218,6 +219,30 @@ function installNavbarButtonFunctionality() {
 		// Add the new element to the navbar
 		navbar.appendChild(iconLine);
 	}
+
+	/**
+	 * Here we are adding the necessary menu elements that will pop up when the navbar button is clicked.
+	 */
+	// Set the initial sizes an constraints for the navbar menu
+	const MENU_WIDTH_RATIO = 0.25;
+	const SMALLEST_ACCEPTABLE_MENU_WIDTH = 350;
+	navbarMenuDiv.style.width = Math.max((MENU_WIDTH_RATIO + (docElem.clientWidth > window.innerHeight ? 0 : (1 - docElem.clientWidth / window.innerHeight) * (1 - MENU_WIDTH_RATIO))) * docElem.clientWidth, SMALLEST_ACCEPTABLE_MENU_WIDTH) + "px";
+
+	// Dynamically resize the navbar menu so that it fits in screens of all sizes
+	window.addEventListener("resize", () => {
+		// If the new window height change is significant, update the window height value used for calculating the body width
+		let resizeNavbarMenu = firstResize || prevWindowWidth != docElem.clientWidth;
+
+		// Make sure that the main text of the body looks good
+		if (resizeNavbarMenu) {
+			navbarMenuDiv.style.width = Math.max((MENU_WIDTH_RATIO + (docElem.clientWidth > window.innerHeight ? 0 : (1 - docElem.clientWidth / window.innerHeight) * (1 - MENU_WIDTH_RATIO))) * docElem.clientWidth, SMALLEST_ACCEPTABLE_MENU_WIDTH) + "px";
+
+			firstResize = false;
+			prevWindowWidth = docElem.clientWidth;
+		}
+	});
+
+
 
 	/**
 	 * Here we are defining the animations that will take place when the navbar button is clicked.
@@ -323,131 +348,21 @@ function installNavbarButtonFunctionality() {
 		}
 	}
 
+	const MOUSE_1 = 1;
+
 	let navbarActive = false;
 	let mousedownTarget = null;
-	document.addEventListener("mousedown", e => mousedownTarget = e.target);
+	document.addEventListener("mousedown", e => mousedownTarget = e.which == MOUSE_1 ? e.target : null);
 	navbar.addEventListener("mouseup", e => {
-		if (Object.is(mousedownTarget, e.target)) {
+		if (Object.is(mousedownTarget, e.target) && e.which == MOUSE_1) {
 			// First stop the animator of all animations that may be in play.
 			navbarAnimator.removeAll();
 
 			// The button was just fully clicked, so change its active state and perform the appropriate actions.	
 			navbarActive = !navbarActive;
 
-			if (navbarActive) {
-				// Animate the navbar icon lines forward (to the "X" state).
-				for (let i = 0; i < forwardNavbarIconLineInterruptableAnimations.length; i++) {
-					let animations = forwardNavbarIconLineInterruptableAnimations[i];
-
-					// The first icon line will become the downward diagonal
-					if (i == 0) {
-						let iconLine = animations[0].targetElement;
-						let currentTransform = iconLine.style.transform;
-
-						if (currentTransform === "") {
-							iconLine.style.transform = "translateY(0px) rotate(0deg)";
-							currentTransform = iconLine.style.transform;
-						}
-
-						animations[0].startValues = getTransformValues(currentTransform);
-						navbarAnimator.animate(animations[0]);
-					}
-
-					// The last icon line will become the upward diagonal
-					else if (i == NUM_ICON_LINES - 1) {
-						let iconLine = animations[0].targetElement;
-						let currentTransform = iconLine.style.transform;
-
-						if (currentTransform === "") {
-							iconLine.style.transform = "translateY(0px) rotate(0deg)";
-							currentTransform = iconLine.style.transform;
-						}
-
-						animations[0].startValues = getTransformValues(currentTransform);
-						navbarAnimator.animate(animations[0]);
-					}
-
-					// All other icons shrink in size and opacity
-					else {
-						let iconLine = animations[0].targetElement;
-						let currentOpacity = iconLine.style.opacity;
-						if (currentOpacity === "")
-							currentOpacity = 1;
-						else
-							currentOpacity = +currentOpacity;
-
-						let currentWidth = +iconLine.style.width.replace(/\s*\D*$/, "");
-						let currentLeft = +iconLine.style.left.replace(/\s*\D*$/, "");
-
-						// Update the dynamic values of the animation object so that interruptions are smooth.
-						animations[0].startValues = [currentOpacity];
-						animations[1].startValues = [currentWidth];
-						animations[2].startValues = [currentLeft];
-
-						// Add the animations to the animator
-						for (let j = 0; j < animations.length; j++)
-							navbarAnimator.animate(animations[j]);
-					}
-				}
-			}
-
-			else {
-				// Animate the navbar icons backward (to the horizontal state).
-				for (let i = 0; i < backwardNavbarIconLineInterruptableAnimations.length; i++) {
-					let animations = backwardNavbarIconLineInterruptableAnimations[i];
-
-					// The first icon line will become the downward diagonal
-					// The first icon line will become the downward diagonal
-					if (i == 0) {
-						let iconLine = animations[0].targetElement;
-						let currentTransform = iconLine.style.transform;
-
-						if (currentTransform === "") {
-							iconLine.style.transform = "translateY(0px) rotate(0deg)";
-							currentTransform = iconLine.style.transform;
-						}
-
-						animations[0].startValues = getTransformValues(currentTransform);
-						navbarAnimator.animate(animations[0]);
-					}
-
-					// The last icon line will become the upward diagonal
-					else if (i == NUM_ICON_LINES - 1) {
-						let iconLine = animations[0].targetElement;
-						let currentTransform = iconLine.style.transform;
-
-						if (currentTransform === "") {
-							iconLine.style.transform = "translateY(0px) rotate(0deg)";
-							currentTransform = iconLine.style.transform;
-						}
-
-						animations[0].startValues = getTransformValues(currentTransform);
-						navbarAnimator.animate(animations[0]);
-					}
-
-					// All other icons shrink in size and opacity
-					else {
-						let iconLine = animations[0].targetElement;
-						let currentOpacity = iconLine.style.opacity;
-						if (currentOpacity === "")
-							currentOpacity = 1;
-						else
-							currentOpacity = +currentOpacity;
-
-						let currentWidth = +iconLine.style.width.replace(/\s*\D*$/, "");
-						let currentLeft = +iconLine.style.left.replace(/\s*\D*$/, "");
-
-						// Update the dynamic values of the animation object so that interruptions are smooth.
-						animations[0].startValues = [currentOpacity];
-						animations[1].startValues = [currentWidth];
-						animations[2].startValues = [currentLeft];
-
-						// Add the animations to the animator
-						for (let j = 0; j < animations.length; j++)
-							navbarAnimator.animate(animations[j]);
-					}
-				}
-			}
+			// Animtes the icon lines on the navbar button.
+			animateIconLines();
 		}
 	});
 
@@ -462,6 +377,7 @@ function installNavbarButtonFunctionality() {
 	window.addEventListener("scroll", () => {
 		let welcomeBottom = welcomeMsg.getBoundingClientRect().bottom;
 
+		// Fist we position the navbar button
 		if (welcomeBottom < 0) {
 			navbarDiv.style.position = "fixed";
 			navbarDiv.style.top = "1.5em";
@@ -473,10 +389,130 @@ function installNavbarButtonFunctionality() {
 			navbarDiv.style.top = null;
 			navbarDiv.style.bottom = "-4.5em";
 		}
+
+		// Then we position the navbar menu
+		navbarMenuDiv.style.top = Math.max(welcomeBottom, 0) + "px";
 	});
 
 	// Fire a scroll event so that the navbar element is correctly positioned on initialization.
 	window.dispatchEvent(new Event("scroll"));
+
+	function animateIconLines() {
+		if (navbarActive) {
+			// Animate the navbar icon lines forward (to the "X" state).
+			for (let i = 0; i < forwardNavbarIconLineInterruptableAnimations.length; i++) {
+				let animations = forwardNavbarIconLineInterruptableAnimations[i];
+
+				// The first icon line will become the downward diagonal
+				if (i == 0) {
+					let iconLine = animations[0].targetElement;
+					let currentTransform = iconLine.style.transform;
+
+					if (currentTransform === "") {
+						iconLine.style.transform = "translateY(0px) rotate(0deg)";
+						currentTransform = iconLine.style.transform;
+					}
+
+					animations[0].startValues = getTransformValues(currentTransform);
+					navbarAnimator.animate(animations[0]);
+				}
+
+				// The last icon line will become the upward diagonal
+				else if (i == NUM_ICON_LINES - 1) {
+					let iconLine = animations[0].targetElement;
+					let currentTransform = iconLine.style.transform;
+
+					if (currentTransform === "") {
+						iconLine.style.transform = "translateY(0px) rotate(0deg)";
+						currentTransform = iconLine.style.transform;
+					}
+
+					animations[0].startValues = getTransformValues(currentTransform);
+					navbarAnimator.animate(animations[0]);
+				}
+
+				// All other icons shrink in size and opacity
+				else {
+					let iconLine = animations[0].targetElement;
+					let currentOpacity = iconLine.style.opacity;
+					if (currentOpacity === "")
+						currentOpacity = 1;
+					else
+						currentOpacity = +currentOpacity;
+
+					let currentWidth = +iconLine.style.width.replace(/\s*\D*$/, "");
+					let currentLeft = +iconLine.style.left.replace(/\s*\D*$/, "");
+
+					// Update the dynamic values of the animation object so that interruptions are smooth.
+					animations[0].startValues = [currentOpacity];
+					animations[1].startValues = [currentWidth];
+					animations[2].startValues = [currentLeft];
+
+					// Add the animations to the animator
+					for (let j = 0; j < animations.length; j++)
+						navbarAnimator.animate(animations[j]);
+				}
+			}
+		}
+
+		else {
+			// Animate the navbar icons backward (to the horizontal state).
+			for (let i = 0; i < backwardNavbarIconLineInterruptableAnimations.length; i++) {
+				let animations = backwardNavbarIconLineInterruptableAnimations[i];
+
+				// The first icon line will become the downward diagonal
+				// The first icon line will become the downward diagonal
+				if (i == 0) {
+					let iconLine = animations[0].targetElement;
+					let currentTransform = iconLine.style.transform;
+
+					if (currentTransform === "") {
+						iconLine.style.transform = "translateY(0px) rotate(0deg)";
+						currentTransform = iconLine.style.transform;
+					}
+
+					animations[0].startValues = getTransformValues(currentTransform);
+					navbarAnimator.animate(animations[0]);
+				}
+
+				// The last icon line will become the upward diagonal
+				else if (i == NUM_ICON_LINES - 1) {
+					let iconLine = animations[0].targetElement;
+					let currentTransform = iconLine.style.transform;
+
+					if (currentTransform === "") {
+						iconLine.style.transform = "translateY(0px) rotate(0deg)";
+						currentTransform = iconLine.style.transform;
+					}
+
+					animations[0].startValues = getTransformValues(currentTransform);
+					navbarAnimator.animate(animations[0]);
+				}
+
+				// All other icons shrink in size and opacity
+				else {
+					let iconLine = animations[0].targetElement;
+					let currentOpacity = iconLine.style.opacity;
+					if (currentOpacity === "")
+						currentOpacity = 1;
+					else
+						currentOpacity = +currentOpacity;
+
+					let currentWidth = +iconLine.style.width.replace(/\s*\D*$/, "");
+					let currentLeft = +iconLine.style.left.replace(/\s*\D*$/, "");
+
+					// Update the dynamic values of the animation object so that interruptions are smooth.
+					animations[0].startValues = [currentOpacity];
+					animations[1].startValues = [currentWidth];
+					animations[2].startValues = [currentLeft];
+
+					// Add the animations to the animator
+					for (let j = 0; j < animations.length; j++)
+						navbarAnimator.animate(animations[j]);
+				}
+			}
+		}
+	}
 
 	// Extract the values from the transform css
 	function getTransformValues(transformCSS) {
