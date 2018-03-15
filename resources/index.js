@@ -181,6 +181,7 @@ function installNavbarButtonFunctionality() {
 	const navbarDiv = document.getElementById("navbardiv");
 	const navbar = document.getElementById("navbar");
 	const navbarMenuDiv = document.getElementById("navbarmenudiv");
+	const navbarMenu = document.getElementById("navbarmenu");
 
 	// Define the size of the navbar button
 	let navbarRect = navbar.getBoundingClientRect();
@@ -232,17 +233,19 @@ function installNavbarButtonFunctionality() {
 	window.addEventListener("resize", () => {
 		// If the new window height change is significant, update the window height value used for calculating the body width
 		let resizeNavbarMenu = firstResize || prevWindowWidth != docElem.clientWidth;
+		let welcomeBottom = welcomeMsg.getBoundingClientRect().bottom;
 
-		// Make sure that the main text of the body looks good
+		// Make sure that the width of the navbar menu looks good
 		if (resizeNavbarMenu) {
 			navbarMenuDiv.style.width = Math.max((MENU_WIDTH_RATIO + (docElem.clientWidth > window.innerHeight ? 0 : (1 - docElem.clientWidth / window.innerHeight) * (1 - MENU_WIDTH_RATIO))) * docElem.clientWidth, SMALLEST_ACCEPTABLE_MENU_WIDTH) + "px";
 
 			firstResize = false;
 			prevWindowWidth = docElem.clientWidth;
 		}
+
+		// Make sure that the navbar menu fits on the screen
+		navbarMenuDiv.style.height = Math.min(window.innerHeight, window.innerHeight - welcomeBottom) + "px";
 	});
-
-
 
 	/**
 	 * Here we are defining the animations that will take place when the navbar button is clicked.
@@ -377,7 +380,7 @@ function installNavbarButtonFunctionality() {
 	window.addEventListener("scroll", () => {
 		let welcomeBottom = welcomeMsg.getBoundingClientRect().bottom;
 
-		// Fist we position the navbar button
+		// Positions the navbar button so that it's always on the screen
 		if (welcomeBottom < 0) {
 			navbarDiv.style.position = "fixed";
 			navbarDiv.style.top = "1.5em";
@@ -390,8 +393,11 @@ function installNavbarButtonFunctionality() {
 			navbarDiv.style.bottom = "-4.5em";
 		}
 
-		// Then we position the navbar menu
+		// Positions the navbar menu so that it fits flush under the welcome message (or the top of the screen).
 		navbarMenuDiv.style.top = Math.max(welcomeBottom, 0) + "px";
+
+		// Re-adjusts the height of thet navbar menu so that it fits
+		navbarMenuDiv.style.height = Math.min(window.innerHeight, window.innerHeight - welcomeBottom) + "px";
 	});
 
 	// Fire a scroll event so that the navbar element is correctly positioned on initialization.
