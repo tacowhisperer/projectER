@@ -244,9 +244,6 @@ function installNavbarButtonFunctionality() {
 		// Make sure that the width of the navbar menu looks good
 		if (resizeNavbarMenu) {
 			navbarMenuDiv.style.width = Math.max((MENU_WIDTH_RATIO + (docElem.clientWidth > window.innerHeight ? 0 : (1 - docElem.clientWidth / window.innerHeight) * (1 - MENU_WIDTH_RATIO))) * docElem.clientWidth, SMALLEST_ACCEPTABLE_MENU_WIDTH) + "px";
-
-			firstResize = false;
-			prevWindowWidth = docElem.clientWidth;
 		}
 
 		// Make sure that the navbar menu fits on the screen
