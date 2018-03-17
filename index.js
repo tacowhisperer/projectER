@@ -32,7 +32,20 @@ const welcomeJS = fs.readFileSync('resources/index.js', 'utf8');
 const weeklyMenuHTML = fs.readFileSync('resources/weeklymenu.html', 'utf8');
 const todayMenuHTML = fs.readFileSync('resources/todaymenu.html', 'utf8');
 const locationMenuHTML = fs.readFileSync('resources/locationmenu.html', 'utf8');
-const favicon = fs.readFileSync('resources/favicon.ico');
+const favicons = {
+	favicon: fs.readFileSync('resources/favicon.ico'),
+	16: fs.readFileSync('resources/16x16.png'),
+	24: fs.readFileSync('resources/24x24.png'),
+	32: fs.readFileSync('resources/32x32.png'),
+	48: fs.readFileSync('resources/48x48.png'),
+	57: fs.readFileSync('resources/57x57.png'),
+	64: fs.readFileSync('resources/64x64.png'),
+	72: fs.readFileSync('resources/72x72.png'),
+	114: fs.readFileSync('resources/114x114.png'),
+	120: fs.readFileSync('resources/120x120.png'),
+	144: fs.readFileSync('resources/144x144.png'),
+	152: fs.readFileSync('resources/152x152.png')
+};
 
 
 // Holds the server that listens to new requests
@@ -177,17 +190,31 @@ function start() {
 
 		app.get(/.*favicon\.ico/, (request, response) => {
 			response.type('ico');
-			response.send(favicon);
+			response.send(favicons.favicon);
+		});
+
+		app.get(/(resources)?\/?\d+\.png/i, (request, response) => {
+			let image = favicons[+request.path.replace(/^\D+|\.png$/gi, "")];
+
+			if (!Object.is(undefined, image)) {
+				response.type('png');
+				response.send(image);
+			}
+
+			else {
+				response.status(404);
+				response.send("Cannot GET '" + request.path + "'");
+			}
 		});
 
 		app.get('/Andres', (request, response) => {
 			response.type('html');
-			response.send("finished");
+			response.send("ლ(ಠ_ಠლ) Y U NO USE API LIKE SPECIFIED (╯°□°）╯︵ ┻━┻");
 		});
 
 		app.get('/Jade', (request, response) => {
 			response.type('html');
-			response.send("finished");
+			response.send("Voted best hair 2018. Also, he does not know this exists (yet).");
 		})
 
 		app.get('/Today', (request, response) => {
