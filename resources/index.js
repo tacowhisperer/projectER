@@ -395,6 +395,27 @@ function installNavbarButtonFunctionality() {
 			toggleMenu();		
 	});
 
+	// A click on a navbar menu entry should make the menu get out of the way
+	let navbarMenuEntries = document.getElementsByClassName("navbarmenuentry");
+	let menuTarget = null;
+	for (let i = 0; i < navbarMenuEntries.length; i++) {
+		let navbarMenuEntry = navbarMenuEntries[i];
+
+		if (navbarMenuEntry.tagName.toLowerCase() === "a") {
+			navbarMenuEntry.addEventListener("mousedown", e => {
+				if (e.which == MOUSE_1)
+					menuTarget = navbarMenuEntry;
+				else
+					menuTarget = null;
+			});
+
+			navbarMenuEntry.addEventListener("mouseup", e => {
+				if (navbarActive && e.which == MOUSE_1 && Object.is(navbarMenuEntry, menuTarget))
+					toggleMenu();
+			});
+		}
+	}
+
 	/**
 	 * Here we are doing the necessary setup to position the navbar button to be permanently on the screen,
 	 * but in a cool way.
