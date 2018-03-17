@@ -239,6 +239,10 @@ li {
 	width: 100%;
 }
 
+.nowrap {
+	white-space: nowrap;
+}
+
 p {
 	line-height: 1.5em;
 }
@@ -277,7 +281,7 @@ p {
 	background-color: #16355b;
 	color: #ccc;
 	display: inline-block;
-	height: 8em;
+	height: 8.5em;
 	margin: 0;
 	text-align: center;
 	width: 100%;
