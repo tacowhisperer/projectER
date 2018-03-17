@@ -11,10 +11,15 @@
 	<link rel="apple-touch-icon" sizes="57x57" href="57.png"/>
 	<link rel="apple-touch-icon-precomposed" sizes="57x57" href="57.png"/>
 	<link rel="apple-touch-icon" sizes="72x72" href="72.png"/>
+	<link rel="apple-touch-icon-precomposed" sizes="72x72" href="72.png"/>
 	<link rel="apple-touch-icon" sizes="114x114" href="114.png"/>
+	<link rel="apple-touch-icon-precomposed" sizes="114x114" href="114.png"/>
 	<link rel="apple-touch-icon" sizes="120x120" href="120.png"/>
+	<link rel="apple-touch-icon-precomposed" sizes="120x120" href="120.png"/>
 	<link rel="apple-touch-icon" sizes="144x144" href="144.png"/>
+	<link rel="apple-touch-icon-precomposed" sizes="144x144" href="144.png"/>
 	<link rel="apple-touch-icon" sizes="152x152" href="152.png"/>
+	<link rel="apple-touch-icon-precomposed" sizes="152x152" href="152.png"/>
 	<meta name="application-name" content="Project-ER"/>
 	<meta name="msapplication-TileImage" content="144.png"/>
 	<meta name="msapplication-TileColor" content="#EEEEEE"/>
@@ -23,7 +28,7 @@
 	<link href="https://fonts.googleapis.com/css?family=Ubuntu+Mono" rel="stylesheet"/>
 
 	<!-- Mobile website support -->
-	<meta id="viewport" name="viewport" content="width=device-width, height=device-height, initial-scale=0.75, user-scalable=no, maximum-scale=0.75"/>
+	<meta id="viewport" name="viewport" content="width=device-width, height=device-height, initial-scale=1, user-scalable=no, maximum-scale=1"/>
 
 	<!-- Theming support for Chrome and Opera -->
 	<meta name="theme-color" content="#16355b"/>
@@ -40,7 +45,11 @@
 
 <body>
 	<div id="welcomediv">
-		<h1 id="welcomemsg">Welcome to Project-ER!</h1>
+		<div id="welcomemsgdivwrapper">
+			<div id="welcomemsgdiv">
+				<p id="welcomemsg">Welcome to Project-ER!</p>
+			</div>
+		</div>
 
 		<!-- Holds the "real" navbar that is either static or fixed depending on the scroll of the page. -->
 		<div class="navbar" id="navbardiv"><div id="navbar"></div></div>

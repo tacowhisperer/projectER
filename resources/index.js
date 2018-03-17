@@ -22,8 +22,10 @@ const ANIMATION_DURATION = 250;
  * but responsive homepage.
  */
 window.addEventListener("load", () => {
+	// THIS HAS BEEN FIXED WITH CSS
 	// Resize the viewport for mobile navigators that require it for a better viewing experience.
-	adjustMobileViewport();
+	// adjustMobileViewport();
+	// THIS HAS BEEN FIXED WITH CSS
 
 	// Adds the navigation functionality to the navbar button and positions it dynamically on the page.
 	installNavbarButtonFunctionality();
@@ -183,7 +185,7 @@ function installNavbarButtonFunctionality() {
 	/**
 	 * First we get the elements that we need from the DOM.
 	 */
-	const welcomeMsg = document.getElementById("welcomemsg");
+	const welcomeMsg = document.getElementById("welcomemsgdivwrapper");
 	const navbarDiv = document.getElementById("navbardiv");
 	const navbar = document.getElementById("navbar");
 	const navbarMenuDiv = document.getElementById("navbarmenudiv");

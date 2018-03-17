@@ -47,13 +47,7 @@ body {
 }
 
 h1 {
-	background-color: #16355b;
-	color: #ccc;
-	font-size: 1.9em;
-	line-height: 3.8em;
-	margin: 0;
-	text-align: center;
-	white-space: nowrap;
+	
 }
 
 h2 {
@@ -258,5 +252,33 @@ p {
 	margin: 0;
 	padding: 0;
 	position: relative;
+	width: 100%;
+}
+
+#welcomemsg {
+	display: table-cell;
+	font-size: 2.5em;
+	font-weight: bold;
+	margin: 0;
+	padding: 0;
+	vertical-align: middle;
+}
+
+#welcomemsgdiv {
+	display: table;
+	height: 100%;
+	margin: 0;
+	overflow: hidden;
+	padding: 0;
+	width: 100%;
+}
+
+#welcomemsgdivwrapper {
+	background-color: #16355b;
+	color: #ccc;
+	display: inline-block;
+	height: 8em;
+	margin: 0;
+	text-align: center;
 	width: 100%;
 }
