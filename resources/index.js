@@ -15,7 +15,7 @@ let prevWindowWidth = 0;
 
 // Holds the animator that handles all of the animation processes
 const navbarAnimator = new SimpleCSSAnimator();
-const ANIMATION_DURATION = 150;
+const ANIMATION_DURATION = 250;
 
 /**
  * This code executes once the DOM has fully loaded. It performs the necessary setups and handling to have an impactful
@@ -266,7 +266,7 @@ function installNavbarButtonFunctionality() {
 				cssFormatString: "translateY(%dpx) rotate(%ddeg)",
 				startValues: [0, 0], // dynamic
 				endValues: [navbarHeight / 2 - +iconLines[i].style.top.replace(/\D+$/, ""), 45 + ROTATION],
-				duration: ANIMATION_DURATION
+				duration: ANIMATION_DURATION / 2
 			}]);
 
 			backwardNavbarIconLineInterruptableAnimations.push([{
@@ -275,7 +275,7 @@ function installNavbarButtonFunctionality() {
 				cssFormatString: "translateY(%dpx) rotate(%ddeg)",
 				startValues: [navbarHeight / 2 - +iconLines[i].style.top.replace(/\D+$/, ""), 45 + ROTATION], // dynamic
 				endValues: [0, 0],
-				duration: ANIMATION_DURATION
+				duration: ANIMATION_DURATION / 2
 			}]);
 		}
 
@@ -287,7 +287,7 @@ function installNavbarButtonFunctionality() {
 				cssFormatString: "translateY(%dpx) rotate(%ddeg)",
 				startValues: [0, 0], // dynamic
 				endValues: [navbarHeight / 2 - +iconLines[i].style.top.replace(/\D+$/, ""), -45 - ROTATION],
-				duration: ANIMATION_DURATION
+				duration: ANIMATION_DURATION / 2
 			}]);
 
 			backwardNavbarIconLineInterruptableAnimations.push([{
@@ -296,7 +296,7 @@ function installNavbarButtonFunctionality() {
 				cssFormatString: "translateY(%dpx) rotate(%ddeg)",
 				startValues: [navbarHeight / 2 - +iconLines[i].style.top.replace(/\D+$/, ""), -45 - ROTATION], // dynamic
 				endValues: [0, 0],
-				duration: ANIMATION_DURATION
+				duration: ANIMATION_DURATION / 2
 			}]);
 		}
 
@@ -308,21 +308,21 @@ function installNavbarButtonFunctionality() {
 				cssFormatString: "%d",
 				startValues: [1], // dynamic
 				endValues: [0],
-				duration: ANIMATION_DURATION
+				duration: ANIMATION_DURATION / 2
 			}, {
 				targetElement: iconLines[i],
 				css: "width",
 				cssFormatString: "%dpx",
 				startValues: [ICON_LINE_WIDTH], // dynamic
 				endValues: [0],
-				duration: ANIMATION_DURATION
+				duration: ANIMATION_DURATION / 2
 			}, {
 				targetElement: iconLines[i],
 				css: "left",
 				cssFormatString: "%dpx",
 				startValues: [(navbarWidth - ICON_LINE_WIDTH) / 2], // dynamic
 				endValues: [navbarWidth / 2],
-				duration: ANIMATION_DURATION
+				duration: ANIMATION_DURATION / 2
 			}]);
 
 			backwardNavbarIconLineInterruptableAnimations.push([{
@@ -331,21 +331,21 @@ function installNavbarButtonFunctionality() {
 				cssFormatString: "%d",
 				startValues: [0], // dynamic
 				endValues: [1],
-				duration: ANIMATION_DURATION
+				duration: ANIMATION_DURATION / 2
 			}, {
 				targetElement: iconLines[i],
 				css: "width",
 				cssFormatString: "%dpx",
 				startValues: [0], // dynamic
 				endValues: [ICON_LINE_WIDTH],
-				duration: ANIMATION_DURATION
+				duration: ANIMATION_DURATION / 2
 			}, {
 				targetElement: iconLines[i],
 				css: "left",
 				cssFormatString: "%dpx",
 				startValues: [navbarWidth / 2], // dynamic
 				endValues: [(navbarWidth - ICON_LINE_WIDTH) / 2],
-				duration: ANIMATION_DURATION
+				duration: ANIMATION_DURATION / 2
 			}]);
 		}
 	}
