@@ -15,7 +15,8 @@ let prevWindowWidth = 0;
 
 // Holds the animator that handles all of the animation processes
 const navbarAnimator = new SimpleCSSAnimator();
-const ANIMATION_DURATION = 250;
+const MENU_ANIMATION_DURATION = 250;
+const ICON_LINES_ANIMATION_DURATION = 100;
 
 /**
  * This code executes once the DOM has fully loaded. It performs the necessary setups and handling to have an impactful
@@ -235,7 +236,10 @@ function installNavbarButtonFunctionality() {
 	// Set the initial sizes an constraints for the navbar menu
 	const MENU_WIDTH_RATIO = 0.25;
 	const SMALLEST_ACCEPTABLE_MENU_WIDTH = 330;
-	navbarMenuDiv.style.width = Math.max((MENU_WIDTH_RATIO + (docElem.clientWidth > window.innerHeight ? 0 : (1 - docElem.clientWidth / window.innerHeight) * (1 - MENU_WIDTH_RATIO))) * docElem.clientWidth, SMALLEST_ACCEPTABLE_MENU_WIDTH) + "px";
+	navbarMenuDiv.style.width = Math.min(Math.max(
+		(MENU_WIDTH_RATIO + (docElem.clientWidth > window.innerHeight ? 0 : (1 - docElem.clientWidth / window.innerHeight) * (1 - MENU_WIDTH_RATIO))) * docElem.clientWidth,
+		SMALLEST_ACCEPTABLE_MENU_WIDTH
+	), docElem.clientWidth) + "px";
 
 	// Dynamically resize the navbar menu so that it fits in screens of all sizes
 	window.addEventListener("resize", () => {
@@ -245,7 +249,10 @@ function installNavbarButtonFunctionality() {
 
 		// Make sure that the width of the navbar menu looks good
 		if (resizeNavbarMenu) {
-			navbarMenuDiv.style.width = Math.max((MENU_WIDTH_RATIO + (docElem.clientWidth > window.innerHeight ? 0 : (1 - docElem.clientWidth / window.innerHeight) * (1 - MENU_WIDTH_RATIO))) * docElem.clientWidth, SMALLEST_ACCEPTABLE_MENU_WIDTH) + "px";
+			navbarMenuDiv.style.width = Math.min(Math.max(
+				(MENU_WIDTH_RATIO + (docElem.clientWidth > window.innerHeight ? 0 : (1 - docElem.clientWidth / window.innerHeight) * (1 - MENU_WIDTH_RATIO))) * docElem.clientWidth,
+				SMALLEST_ACCEPTABLE_MENU_WIDTH
+			), docElem.clientWidth) + "px";
 		}
 
 		// Make sure that the navbar menu fits on the screen
@@ -268,7 +275,7 @@ function installNavbarButtonFunctionality() {
 				cssFormatString: "translateY(%dpx) rotate(%ddeg)",
 				startValues: [0, 0], // dynamic
 				endValues: [navbarHeight / 2 - +iconLines[i].style.top.replace(/\D+$/, ""), 45 + ROTATION],
-				duration: ANIMATION_DURATION / 2
+				duration: ICON_LINES_ANIMATION_DURATION
 			}]);
 
 			backwardNavbarIconLineInterruptableAnimations.push([{
@@ -277,7 +284,7 @@ function installNavbarButtonFunctionality() {
 				cssFormatString: "translateY(%dpx) rotate(%ddeg)",
 				startValues: [navbarHeight / 2 - +iconLines[i].style.top.replace(/\D+$/, ""), 45 + ROTATION], // dynamic
 				endValues: [0, 0],
-				duration: ANIMATION_DURATION / 2
+				duration: ICON_LINES_ANIMATION_DURATION
 			}]);
 		}
 
@@ -289,7 +296,7 @@ function installNavbarButtonFunctionality() {
 				cssFormatString: "translateY(%dpx) rotate(%ddeg)",
 				startValues: [0, 0], // dynamic
 				endValues: [navbarHeight / 2 - +iconLines[i].style.top.replace(/\D+$/, ""), -45 - ROTATION],
-				duration: ANIMATION_DURATION / 2
+				duration: ICON_LINES_ANIMATION_DURATION
 			}]);
 
 			backwardNavbarIconLineInterruptableAnimations.push([{
@@ -298,7 +305,7 @@ function installNavbarButtonFunctionality() {
 				cssFormatString: "translateY(%dpx) rotate(%ddeg)",
 				startValues: [navbarHeight / 2 - +iconLines[i].style.top.replace(/\D+$/, ""), -45 - ROTATION], // dynamic
 				endValues: [0, 0],
-				duration: ANIMATION_DURATION / 2
+				duration: ICON_LINES_ANIMATION_DURATION
 			}]);
 		}
 
@@ -310,21 +317,21 @@ function installNavbarButtonFunctionality() {
 				cssFormatString: "%d",
 				startValues: [1], // dynamic
 				endValues: [0],
-				duration: ANIMATION_DURATION / 2
+				duration: ICON_LINES_ANIMATION_DURATION
 			}, {
 				targetElement: iconLines[i],
 				css: "width",
 				cssFormatString: "%dpx",
 				startValues: [ICON_LINE_WIDTH], // dynamic
 				endValues: [0],
-				duration: ANIMATION_DURATION / 2
+				duration: ICON_LINES_ANIMATION_DURATION
 			}, {
 				targetElement: iconLines[i],
 				css: "left",
 				cssFormatString: "%dpx",
 				startValues: [(navbarWidth - ICON_LINE_WIDTH) / 2], // dynamic
 				endValues: [navbarWidth / 2],
-				duration: ANIMATION_DURATION / 2
+				duration: ICON_LINES_ANIMATION_DURATION
 			}]);
 
 			backwardNavbarIconLineInterruptableAnimations.push([{
@@ -333,21 +340,21 @@ function installNavbarButtonFunctionality() {
 				cssFormatString: "%d",
 				startValues: [0], // dynamic
 				endValues: [1],
-				duration: ANIMATION_DURATION / 2
+				duration: ICON_LINES_ANIMATION_DURATION
 			}, {
 				targetElement: iconLines[i],
 				css: "width",
 				cssFormatString: "%dpx",
 				startValues: [0], // dynamic
 				endValues: [ICON_LINE_WIDTH],
-				duration: ANIMATION_DURATION / 2
+				duration: ICON_LINES_ANIMATION_DURATION
 			}, {
 				targetElement: iconLines[i],
 				css: "left",
 				cssFormatString: "%dpx",
 				startValues: [navbarWidth / 2], // dynamic
 				endValues: [(navbarWidth - ICON_LINE_WIDTH) / 2],
-				duration: ANIMATION_DURATION / 2
+				duration: ICON_LINES_ANIMATION_DURATION
 			}]);
 		}
 	}
@@ -360,7 +367,7 @@ function installNavbarButtonFunctionality() {
 		startValues: [0], // dynamic
 		endValues: [1],
 		onAnimationStart: () => navbarMenuDiv.style.display = "inline-block",
-		duration: ANIMATION_DURATION
+		duration: MENU_ANIMATION_DURATION
 	}];
 	
 	let backwardNavbarMenuInterruptableAnimations = [{
@@ -370,7 +377,7 @@ function installNavbarButtonFunctionality() {
 		startValues: [1], // dynamic
 		endValues: [0],
 		onAnimationEnd: () => navbarMenuDiv.style.display = "none",
-		duration: ANIMATION_DURATION
+		duration: MENU_ANIMATION_DURATION
 	}];
 
 	const MOUSE_1 = 1;
