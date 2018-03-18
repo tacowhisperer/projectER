@@ -82,11 +82,9 @@
 		<hr>
 		<p>Project-ER, namely Project Eat Rice, is written in JavaScript using <a class="referencelink boldtext" href="https://nodejs.org/en/" target="_blank">Node.js</a> + <a class="referencelink boldtext" href="https://expressjs.com/" target="_blank">Express</a> + <a class="referencelink boldtext" href="https://www.npmjs.com/package/download-file" target="_blank">download-file</a> + <a class="referencelink boldtext" href="https://www.npmjs.com/package/pdf2json" target="_blank">pdf2json</a>. </p>
 
-		<p>It began as a proof-of-concept during HackRice 7.5 in 2018. Even though the idea of providing a way to get menu information at Rice is not original, the devs noted that nobody had provided an easy way to access the weekly menu information from the Rice Dining website. This project aim to tackle this. It takes the weekly servery menus found <a class="referencelink boldtext" href="http://dining.rice.edu/undergraduate-dining/college-serveries/weekly-menus/" target="_blank">here</a>, and then converts them from PDF format into an easy-to-process JSON format. Though this solution is far from perfect, it shows that the menu information can be obtained and organized from the PDF file format.</p>
+		<p>It began as a proof-of-concept during HackRice 7.5 in 2018. Even though the idea of providing a way to get menu information at Rice is not original, the devs noted that nobody had provided an easy way to access the weekly menu information from the Rice Dining website. This project aims to tackle this. It takes the weekly servery menus found on <a class="referencelink boldtext" href="http://dining.rice.edu/undergraduate-dining/college-serveries/weekly-menus/" target="_blank">the Rice Dining page</a>, and then converts them from the provided PDF format into an easy-to-process JSON format.</p>
 
-		<p>More APIs are planned to be implemented in the near future, so stay tuned for those.</p>
-
-		<p>Source code for Project-ER can be found <a class="referencelink boldtext" href="https://github.com/tacowhisperer/projectER" target="_blank">here</a>.</p>
+		<p>Though this solution is far from perfect, it shows that the menu information can be obtained and organized from the PDF file format. More APIs are planned to be implemented in the near future, so stay tuned for those. Source code for Project-ER can be found <a class="referencelink boldtext" href="https://github.com/tacowhisperer/projectER" target="_blank">here</a>.</p>
 
 		<br>
 		<br>
@@ -94,7 +92,7 @@
 
 		<h2 id="gettingstarted">Getting Started</h2>
 		<hr>
-		<p>Simply create your own application that can make GET requests over the internet to <span class="referencelink boldtext" id="thisurl"></span> (this page). Then specify which API you want to use and the appropriate response data will be sent. The APIs are outlined in greater detail below.</p>
+		<p>Simply make GET requests over the internet to <span class="referencelink boldtext" id="thisurl"></span> (this page) with whatever information you need to access. Then, the appropriate response data will be sent. The APIs are outlined in greater detail below.</p>
 
 		<br>
 		<br>
@@ -158,7 +156,8 @@
 
 		<h2 id="troubleshooting">Troubleshooting</h2>
 		<hr>
-		<p>If you can see this page, it means that the server is up and running as expected. However, if something is not behaving as it should be, send a message to either Andres (<a class="referencelink boldtext" href="mailto:as100@rice.edu">as100@rice.edu</a>) or Jade (<a class="referencelink boldtext" href="mailto:jcd7@rice.edu">jcd7@rice.edu</a>) to fix it as soon as possible.</p>
+		<p>If you can see this page, it means that the server is up and running as expected. Do note that we are aware that it may sometimes feel a bit sluggish to access our data. This is due to the way Heroku handles webapps. Basically, if our webapp is not accessed by anyone in 30 minutes, the dyno hosting it will "sleep." This means that the very first access after falling asleep will take something like 10 seconds for the dyno to wake up and start hosting again. Since the menus are only updated once a week, we suggest you cache the information you need so as to avoid slowdowns on your applications.</p>
+		<p>If, however, something else is not behaving as it should be, send a message to either Andres (<a class="referencelink boldtext" href="mailto:as100@rice.edu?subject=[Project-ER Troubleshooting]&cc=jcd7@rice.edu">as100@rice.edu</a>) or Jade (<a class="referencelink boldtext" href="mailto:jcd7@rice.edu?subject=[Project-ER Troubleshooting]&cc=as100@rice.edu">jcd7@rice.edu</a>) to fix it as soon as possible.</p>
 
 		<br>
 		<br>

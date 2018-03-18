@@ -1,7 +1,12 @@
 a.navbarmenuentry {
+	color: black;
 	margin: 0;
 	padding: 0;
 	text-decoration: none;
+}
+
+a.navbarmenuentry:hover {
+	color: #16355b;
 }
 
 body {
@@ -261,7 +266,7 @@ p {
 
 #welcomemsg {
 	display: table-cell;
-	font-size: 2.5em;
+	font-size: 2.25em;
 	font-weight: bold;
 	margin: 0;
 	padding: 0;
