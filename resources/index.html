@@ -1,10 +1,13 @@
 <!DOCTYPE html>
 <!-- Copyright 2018 (c). All rights reserved. But we don't really care, so do what you must. -->
 
-<html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 
 <head>
 	<title>Project-ER</title>
+
+	<!-- Search keywords -->
+	<meta name="keywords" content="project-er, rice dining, rice weekly menu, rice University weekly menu, rice owls, houston, texas, meal, meals, menus"/>
 	
 	<!-- Favicon Support for all kinds of devices -->
 	<link rel="shortcut icon" sizes="16x16 24x24 32x32 48x48 64x64" href="/favicon.ico"/>
@@ -82,9 +85,11 @@
 		<hr>
 		<p>Project-ER, namely Project Eat Rice, is written in JavaScript using <a class="referencelink boldtext" href="https://nodejs.org/en/" target="_blank">Node.js</a> + <a class="referencelink boldtext" href="https://expressjs.com/" target="_blank">Express</a> + <a class="referencelink boldtext" href="https://www.npmjs.com/package/download-file" target="_blank">download-file</a> + <a class="referencelink boldtext" href="https://www.npmjs.com/package/pdf2json" target="_blank">pdf2json</a>. </p>
 
-		<p>It began as a proof-of-concept during HackRice 7.5 in 2018. Even though the idea of providing a way to get menu information at Rice is not original, the devs noted that nobody had provided an easy way to access the weekly menu information from the Rice Dining website. This project aims to tackle this. It takes the weekly servery menus found on <a class="referencelink boldtext" href="http://dining.rice.edu/undergraduate-dining/college-serveries/weekly-menus/" target="_blank">the Rice Dining page</a>, and then converts them from the provided PDF format into an easy-to-process JSON format.</p>
+		<p>It began as a proof-of-concept during HackRice 7.5 in 2018. Even though the idea of providing a way to get menu information at Rice is not original, the devs noted that nobody had provided an easy way to access the weekly menu information from the Rice Dining website. This project aims to tackle this. It takes the weekly servery menus found on <a class="referencelink boldtext" href="http://dining.rice.edu/undergraduate-dining/college-serveries/weekly-menus/" target="_blank">this Rice Dining page</a>, and then converts them from the provided PDF format into an easy-to-process JSON format.</p>
 
-		<p>Though this solution is far from perfect, it shows that the menu information can be obtained and organized from the PDF file format. More APIs are planned to be implemented in the near future, so stay tuned for those. Source code for Project-ER can be found <a class="referencelink boldtext" href="https://github.com/tacowhisperer/projectER" target="_blank">here</a>.</p>
+		<p>Though this solution is far from perfect, it shows that the menu information can be obtained and organized from the PDF file format. More APIs are planned to be implemented in the near future, so stay tuned for those.</p>
+
+		<p>Source code for Project-ER can be found <a class="referencelink boldtext" href="https://github.com/tacowhisperer/projectER" target="_blank">here</a>.</p>
 
 		<br>
 		<br>
@@ -100,7 +105,7 @@
 
 		<h2 id="apiusage">API Reference Guide</h2>
 		<hr>
-		<p>The list below shows the different GET requests and outputs of those requests. Note that any text that is in bold in the examples should be interpreted literally.</p>
+		<p>The list below shows the different GET requests and outputs of those requests (note that any text that is in bold in the examples should be interpreted literally). Feel free to click on any <span class="getrequest">text boxes</span> you see to see what the current live output is.</p>
 		<ul>
 			<li id="weeklymenuapi">
 				<a class="getrequest" href="/WeeklyMenu" target="_blank">&#47;WeeklyMenu</a>: Returns a JSON object (<span class="boldtext">application/json</span>) of the weekly menu for all serveries that have a weekly menu PDF <a class="referencelink boldtext" href="http://dining.rice.edu/undergraduate-dining/college-serveries/weekly-menus/" target="_blank">here</a>. The format of this JSON object is as follows:
@@ -156,7 +161,7 @@
 
 		<h2 id="troubleshooting">Troubleshooting</h2>
 		<hr>
-		<p>If you can see this page, it means that the server is up and running as expected. Do note that we are aware that it may sometimes feel a bit sluggish to access our data. This is due to the way Heroku handles webapps. Basically, if our webapp is not accessed by anyone in 30 minutes, the dyno hosting it will "sleep." This means that the very first access after falling asleep will take something like 10 seconds for the dyno to wake up and start hosting again. Since the menus are only updated once a week, we suggest you cache the information you need so as to avoid slowdowns on your applications.</p>
+		<p>If you can see this page, it means that the server is up and running as expected. We are aware that it may sometimes feel a bit sluggish to access our data. This is due to the way Heroku handles webapps. Basically, if our webapp is not accessed by anyone in 30 minutes, the dyno hosting it will "sleep." This means that the very first access after falling asleep will take something like 10 seconds for the dyno to wake up and start hosting again. Since the menus are only updated once a week, we suggest you cache the information you need so as to avoid slowdowns on your applications.</p>
 		<p>If, however, something else is not behaving as it should be, send a message to either Andres (<a class="referencelink boldtext" href="mailto:as100@rice.edu?subject=[Project-ER Troubleshooting]&cc=jcd7@rice.edu">as100@rice.edu</a>) or Jade (<a class="referencelink boldtext" href="mailto:jcd7@rice.edu?subject=[Project-ER Troubleshooting]&cc=as100@rice.edu">jcd7@rice.edu</a>) to fix it as soon as possible.</p>
 
 		<br>
